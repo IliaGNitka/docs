@@ -9,7 +9,7 @@
   "favicon": "/favicon.svg",
   "navigation": [
     {
-      "name": "Int3face",
+      "group": "Int3face",
       "pages": [
         "docs/int3face/overview"
       ]
