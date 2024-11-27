@@ -11,46 +11,17 @@
     {
       "group": "Int3face",
       "pages": [
-        "docs/int3face/overview"
-      ]
-    },
-    {
-      "group": "Build and run",
-      "pages": [
-        "docs/int3face/build-and-run/bch_deploy",
-        "docs/int3face/build-and-run/brc20",
-        "docs/int3face/build-and-run/btc_deploy",
+        "docs/int3face/overview",
         {
-          "group": "Brc20",
+          "group": "Build and run",
           "pages": [
+            "docs/int3face/build-and-run/bch_deploy",
             "docs/int3face/build-and-run/brc20",
-            "docs/int3face/build-and-run/btc_deploy"
+            "docs/int3face/build-and-run/btc_deploy",
+            "docs/int3face/build-and-run/doge_deploy",
+            "docs/int3face/build-and-run/ltc_deploy"
           ]
         }
-      ]
-    },
-    {
-      "group": "Brc20",
-      "pages": [
-        "docs/int3face/build-and-run/brc20"
-      ]
-    },
-    {
-      "group": "Btc Deploy",
-      "pages": [
-        "docs/int3face/build-and-run/btc_deploy"
-      ]
-    },
-    {
-      "group": "Doge Deploy",
-      "pages": [
-        "docs/int3face/build-and-run/doge_deploy"
-      ]
-    },
-    {
-      "group": "Ltc Deploy",
-      "pages": [
-        "docs/int3face/build-and-run/ltc_deploy"
       ]
     },
     {
