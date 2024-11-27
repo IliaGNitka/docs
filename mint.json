@@ -19,7 +19,14 @@
       "pages": [
         "docs/int3face/build-and-run/bch_deploy",
         "docs/int3face/build-and-run/brc20",
-        "docs/int3face/build-and-run/btc_deploy"
+        "docs/int3face/build-and-run/btc_deploy",
+        {
+          "group": "Brc20",
+          "pages": [
+            "docs/int3face/build-and-run/brc20",
+            "docs/int3face/build-and-run/btc_deploy"
+          ]
+        }
       ]
     },
     {
