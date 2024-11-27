@@ -3,11 +3,12 @@ title: "Bridge"
 ---
 
 * Int3face
+
 * Bridge
 
 On this page
 
-![banner](/docs/assets/images/banner-c3a9e34c0386b1410bc41c59267a8875.jpg)
+![banner](./docs/assets/images/banner-c3a9e34c0386b1410bc41c59267a8875.jpg)
 
 ## Abstract[​](#abstract "Direct link to Abstract")
 
@@ -15,40 +16,59 @@ This README provides a detailed outline of the bridging mechanism implementation
 
 ## Contents[​](#contents "Direct link to Contents")
 
-* **[Concepts](#concepts)**
+* [Concepts](#concepts)
 
-  * **[Super valset](#super-valset)**
-  * **[Vault](#vault)**
-  * **[Observer](#observer)**
-  * **[Asset](#asset)**
-  * **[Minting and burning](#minting-and-burning)**
-  * **[Votes](#votes)**
-  * **[Rate limiting](#rate-limiting)**
-  * **[Quarantine](#quarantine)**
-  * **[Validator fee](#validator-fee)**
-  * **[Refunds](#refunds)**
-  * **[Threshold signature scheme](#threshold-signature-scheme)**
-  * **[Validator committee](#validator-committee)**
-  * **[Pool public key](#pool-public-key)**
-  * **[Validator rotation](#validator-rotation)**
+  * [Super valset](#super-valset)
 
-* **[Design](#design)**
+  * [Vault](#vault)
 
-  * **[Inbound transfers](#inbound-transfers)**
-  * **[Outbound transfers](#outbound-transfers)**
-  * **[Observer](#observer-1)**
-  * **[UTXO Chain Client](#utxo-chain-client)**
-  * **[Int3face Chain Client](#int3face-chain-client)**
-  * **[Quarantine](#quarantine-1)**
-  * **[Validators reviving](#validator-reviving)**
+  * [Observer](#observer)
 
-* **[State](#state)**
+  * [Asset](#asset)
 
-* **[Query Server](#query-server)**
+  * [Minting and burning](#minting-and-burning)
 
-* **[Message Server](#message-server)**
+  * [Votes](#votes)
 
-* **[Events](#events)**
+  * [Rate limiting](#rate-limiting)
+
+  * [Quarantine](#quarantine)
+
+  * [Validator fee](#validator-fee)
+
+  * [Refunds](#refunds)
+
+  * [Threshold signature scheme](#threshold-signature-scheme)
+
+  * [Validator committee](#validator-committee)
+
+  * [Pool public key](#pool-public-key)
+
+  * [Validator rotation](#validator-rotation)
+
+* [Design](#design)
+
+  * [Inbound transfers](#inbound-transfers)
+
+  * [Outbound transfers](#outbound-transfers)
+
+  * [Observer](#observer-1)
+
+  * [UTXO Chain Client](#utxo-chain-client)
+
+  * [Int3face Chain Client](#int3face-chain-client)
+
+  * [Quarantine](#quarantine-1)
+
+  * [Validators reviving](#validator-reviving)
+
+* [State](#state)
+
+* [Query Server](#query-server)
+
+* [Message Server](#message-server)
+
+* [Events](#events)
 
 ## Concepts[​](#concepts "Direct link to Concepts")
 
@@ -69,11 +89,13 @@ The **Observer**, running as part of the `int3obs` binary, operates exclusively 
 * **External Chain Clients**: One for each chain, consolidates chain-specific observer and client logic under a single interface
 
   * **Scanner**: Tracks all transactions occuring within the vault. Upon identifying a valid transaction (e.g., one with the correct memo), they signal it to the **observer**
+
   * **Client**: One for each chain, these clients communicate with external chains, allowing the **observer** to perform transfers and other supporting operations.
 
 * **Int3face Chain Client**: Consolidates Int3face-specific observer and client logic under a single interface
 
   * **Scanner**: Monitors all tx results on Int3face, focusing only on relevant ones such as **MsgOutboundTransfer**. Upon identifying outbound transfer it signals it to the **observer**
+
   * **Client**: Helps perform method calls to Int3face such as triggering **MsgInboundTransfer**.
 
 * **Observer**: Responsible for listening to outbound transfers from chains and facilitating their routing to the destination chain
@@ -87,6 +109,7 @@ The **Observer**, running as part of the `int3obs` binary, operates exclusively 
 In the context of Int3face, an asset refers to the representation of an external token within Int3face. Specifically, an asset is identified by a pair: the name of the external chain and the corresponding token on that chain. For example:
 
 * Source chain: Bitcoin, token: BTC
+
 * Source chain: Ethereum, token: USDT
 
 The asset has a status and the 'last transfer height'.
@@ -96,8 +119,11 @@ Each asset is characterized by its status and the last transfer height.
 The asset's status indicates the types of transfers that are permissible with it. The possible statuses are:
 
 * Only inbound transfers allowed.
+
 * Only outbound transfers allowed.
+
 * Both inbound and outbound transfers allowed.
+
 * All transfers blocked.
 
 The 'last transfer height' refers to the latest block height on the asset’s chain containing the finalized transfer. You can find more details about the finalization process in the [Votes](#votes) section. Validators use this height as a starting point for the **observer**.
@@ -119,6 +145,7 @@ The module utilizes tokenfactory functionality to facilitate cross-chain transfe
 The transfer process is straightforward:
 
 * When the `x/bridge` module receives an inbound transfer, it starts accumulating votes for this transfer. Once the vote threshold is met, it employs the tokenfactory's `Mint` method to mint the appropriate amount of coins for the destination address.
+
 * For an outbound transfer, the `x/bridge` module uses the tokenfactory's `Burn` method to burn the specified amount of coins from the sender's address. Subsequently, an **EventOutboundTransfer** event is emitted and handled by the **super valset** through the **observer**.
 
 ### Rate limiting[​](#rate-limiting "Direct link to Rate limiting")
@@ -174,14 +201,23 @@ The following provides a high-level overview of the transfer design. For more in
 ### Inbound transfers[​](#inbound-transfers "Direct link to Inbound transfers")
 
 1. The client initiates the transfer by sending it to the dedicated vault on the external chain.
+
 2. During this process, the client must specify the intended recipient's address in Int3face. The method for specifying varies by chain; for example, it might be done through a memo.
+
 3. Validators in the **super valset** run the **observer** to monitor the vault continuously.
+
 4. Upon detecting a new inbound transfer, these validators process it and generate a **MsgInboundTransfer** message.
+
 5. This message is then sent to the chain proposer by each validator.
+
 6. It’s important to note that as every validator in the **super valset** performs this action, the number of messages in a block will correspond to the size of the **super valset**.
+
 7. Once a block is formed, all Int3face validators begin to process it.
+
 8. They process the transfers sequentially, compiling a list of all validators who have voted (i.e., sent the message) for each transfer.
+
 9. A transfer is deemed **finalized** once the count of voters for it meets the required vote threshold, as set by the module parameter.
+
 10. If the transfer is **finalized**, then coins are minted to the destination address through the `x/tokenfactory` module.
 
 ![inbound\_transfers](/docs/assets/images/inbound_transfer-a47c5ba6e34751d3316ab816e3536ee8.png)
@@ -191,11 +227,17 @@ As a security precaution, all non-finalized transfers are recorded in the state 
 ### Outbound transfers[​](#outbound-transfers "Direct link to Outbound transfers")
 
 1. The transfer process begins when the client invokes the **OutboundTransfer** method via the message server.
+
 2. The `x/bridge` module then processes this request by invoking the tokenfactory's burn function, using the client's address as a burning address.
+
 3. The module generates the **EventOutboundTransfer** event.
+
 4. This event is captured by members of the **super valset** through the **observer**.
+
 5. After receiving it, they start submitting their signatures to the TSS Server.
+
 6. Once the TSS Server collects all the needed signatures, it starts the leader election process.
+
 7. The selected leader broadcasts the transfer to the external chain, releasing the **vault** and transferring coins to the destination address.
 
 ![outbound\_transfers](/docs/assets/images/outbound_transfer-a881a404c8b6257f719831ee8631472f.png)
@@ -209,11 +251,15 @@ The high-level diagram of the observer:
 #### External chain to Int3face[​](#external-chain-to-int3face "Direct link to External chain to Int3face")
 
 1. Tracks outgoing transfer signals sent by chains.
+
 2. Upon receipt, the observer adds them to the internal queue.
+
 3. Periodically, the observer reviews the queue:
 
 * Checks the confirmation number of transfers (e.g., transaction depth in the source chain).
+
 * If confirmed, sends them to the destination chain client for broadcasting.
+
 * If not confirmed, returns them to the queue for later processing.
 
 ![observer\_int3face\_inbound](/docs/assets/images/observer_int3face_inbound-77771292cab8946f7ecfdbb3e90b18e0.png)
@@ -227,6 +273,7 @@ The high-level diagram of the observer:
 Responsible for:
 
 * Observing incoming into the vault transactions and
+
 * Communicating with Bitcoin: sending transactions to release BTC tokens and querying other chain information.
 
 #### UTXO observer[​](#utxo-observer "Direct link to UTXO observer")
@@ -239,26 +286,31 @@ Regularly retrieves new Bitcoin blocks and alerts the observer about transaction
 
 * In case the block is not found, retries the request after the specified `timeout` period.
 
-2. Fetches the transactions of the block using its hash through the [getblock](https://developer.bitcoin.org/reference/rpc/getblock.html) method.
-3. Sequentially examines each transaction within the block:
+1. Fetches the transactions of the block using its hash through the [getblock](https://developer.bitcoin.org/reference/rpc/getblock.html) method.
+
+2. Sequentially examines each transaction within the block:
 
 * Determines the destination address and the amount of tokens transferred by parsing the `Vout` entries in the transaction.
 
   * Parses addresses for each `Vout` and identifies those directed to the designated vault.
+
   * Extracts the token amount from the `Vout.Value` field.
 
 * Retrieves any accompanying memo by examining the `Vout` entry containing the `OP_RETURN` instruction.
 
   * Identifies the `Vout` with the `OP_RETURN` instruction.
+
   * Extracts the recipient address from the instruction data.
 
 * If all required data is successfully collected and the transaction is intended for the designated vault, notifies the observer module about the new outbound transfer.
 
 * Otherwise, logs an error message and proceeds to the next transaction.
 
-4. Updates the `lastObservedHeight` to `lastObservedHeight + 1`.
-5. Updates the block history by including new block data.
-6. Returns to step 1 to repeat the process.
+1. Updates the `lastObservedHeight` to `lastObservedHeight + 1`.
+
+2. Updates the block history by including new block data.
+
+3. Returns to step 1 to repeat the process.
 
 More on the [UTXO transaction format](https://developer.bitcoin.org/reference/transactions.html#raw-transaction-format)
 
@@ -272,9 +324,11 @@ In case of the chain reorganisation the next flow should be applied:
 
 * If the hashes are identical, no further action is required.
 
-2. Collect affected block heights by iterating through block history and comparing hashes from the chain and history at the block's height.
-3. Notify the observer about affected heights, so it can remove pending transactions from its queue.
-4. Re-scan each block at every affected height.
+1. Collect affected block heights by iterating through block history and comparing hashes from the chain and history at the block's height.
+
+2. Notify the observer about affected heights, so it can remove pending transactions from its queue.
+
+3. Re-scan each block at every affected height.
 
 ![utxo\_reorg\_flow](/docs/assets/images/utxo_reorg_flow-94f687f56ed6ba3a488bcec00044a783.png)
 
@@ -283,6 +337,7 @@ In case of the chain reorganisation the next flow should be applied:
 Responsible for:
 
 * Observing outbound transactions from Int3face
+
 * Communicating with Int3face: sending `MsgInboundTransfer` transactions and querying other chain information.
 
 #### Client[​](#client "Direct link to Client")
@@ -292,10 +347,15 @@ Allows signing and broadcasting transactions with `MsgInboundTransfer` messages 
 #### MsgInboundTransfer Broadcast[​](#msginboundtransfer-broadcast "Direct link to MsgInboundTransfer Broadcast")
 
 1. Receive a notification about an inbound transfer message from the **observer**.
+
 2. Build `MsgInboundTransfer` using the data provided in the notification.
+
 3. Create a transaction including `MsgInboundTransfer` and specifying necessary fees and gas limits.
+
 4. Sign the transaction by using the validator's keyring.
+
 5. Encode the transaction using the `TxEncoder`.
+
 6. [Broadcast](https://buf.build/cosmos/cosmos-sdk/docs/main:cosmos.tx.v1beta1#cosmos.tx.v1beta1.Service.BroadcastTx) transaction to the chain.
 
 ![int3face\_broadcast](/docs/assets/images/int3face_broadcast-167e05576a9e0b7b91f9c16d3b88f8f2.png)
@@ -305,10 +365,13 @@ Allows signing and broadcasting transactions with `MsgInboundTransfer` messages 
 Subscribes to the `NewBlockEvent`s from the Int3face chain and notifies the **observer** about observed outbound transfers to the external chain.
 
 1. [Subscribe](https://docs.osmosis.zone/api/#/operations/subscribe) to the new block events (`tm.event='NewBlock'`).
+
 2. Handle each received event:
 
 * Decode the block's transactions using the `TxDecoder`.
+
 * Check if any transaction contains the `MsgOutboundTransfer` message.
+
 * Notify the **observer** about every found outbound message.
 
 ![int3face\_scanner\_flow](/docs/assets/images/int3face_observer_flow-0fd2f23e71791f9a046a596745090a82.png)
@@ -320,6 +383,7 @@ The **quarantining** might be initiated right after an inbound transfer reaches 
 There are two methods for managing quarantined assets:
 
 * Simply storing the queue in the state. Here, if rate limits are exceeded, the coins are added to the state queue without minting. Upon release, the tokenfactory's Mint function is called for the relevant addresses.
+
 * Minting all coins to a special **quarantine** address (not the destination address) immediately after finalization. The coins are then transferred to their intended addresses upon release following a governance proposal. This method still requires the state queue, but operations are based solely on straightforward transfers. It also offers a transparent view of the **quarantine**, represented by a dedicated **quarantine** vault on Int3face.
 
 ![quarantine](/docs/assets/images/quarantine-e9ed906f64712730aab51ec82e47eecc.png)
