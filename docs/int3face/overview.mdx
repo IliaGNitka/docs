@@ -196,7 +196,7 @@ Validator rotation is triggered by a governance proposal. The proposal specifies
 
 The following provides a high-level overview of the transfer design. For more in-depth information, refer to the detailed processes described further.
 
-![image.png](/docs/assets/images/mint_burn-1aa204817a2bfaadb704fb92494b0fac.png)
+![image.png](./docs/assets/images/mint_burn-1aa204817a2bfaadb704fb92494b0fac.png)
 
 ### Inbound transfers[​](#inbound-transfers "Direct link to Inbound transfers")
 
@@ -220,7 +220,7 @@ The following provides a high-level overview of the transfer design. For more in
 
 10. If the transfer is **finalized**, then coins are minted to the destination address through the `x/tokenfactory` module.
 
-![inbound\_transfers](/docs/assets/images/inbound_transfer-a47c5ba6e34751d3316ab816e3536ee8.png)
+![inbound\_transfers](./docs/assets/images/inbound_transfer-a47c5ba6e34751d3316ab816e3536ee8.png)
 
 As a security precaution, all non-finalized transfers are recorded in the state using a `external_id | external_height` composite key during the vote accumulation phase. This approach is designed to guard against the potential of malicious validators submitting transfers with incorrect `external_height` values. Essentially, a transfer entry that has an incorrect `external_height` is unlikely to receive sufficient confirmations, and as a result, it will not reach the finalization stage.
 
@@ -240,13 +240,13 @@ As a security precaution, all non-finalized transfers are recorded in the state 
 
 7. The selected leader broadcasts the transfer to the external chain, releasing the **vault** and transferring coins to the destination address.
 
-![outbound\_transfers](/docs/assets/images/outbound_transfer-a881a404c8b6257f719831ee8631472f.png)
+![outbound\_transfers](./docs/assets/images/outbound_transfer-a881a404c8b6257f719831ee8631472f.png)
 
 ### Observer[​](#observer-1 "Direct link to Observer")
 
 The high-level diagram of the observer:
 
-![observer](/docs/assets/images/observer-b818b5c5ba1294a61c17e60a75e9b88d.png)
+![observer](./docs/assets/images/observer-b818b5c5ba1294a61c17e60a75e9b88d.png)
 
 #### External chain to Int3face[​](#external-chain-to-int3face "Direct link to External chain to Int3face")
 
@@ -262,11 +262,11 @@ The high-level diagram of the observer:
 
 * If not confirmed, returns them to the queue for later processing.
 
-![observer\_int3face\_inbound](/docs/assets/images/observer_int3face_inbound-77771292cab8946f7ecfdbb3e90b18e0.png)
+![observer\_int3face\_inbound](./docs/assets/images/observer_int3face_inbound-77771292cab8946f7ecfdbb3e90b18e0.png)
 
 #### Int3face to external chain[​](#int3face-to-external-chain "Direct link to Int3face to external chain")
 
-![observer\_int3face\_outbound](/docs/assets/images/observer_int3face_outbound-c83462a8bc436fa10842e06a80b14a81.png)
+![observer\_int3face\_outbound](./docs/assets/images/observer_int3face_outbound-c83462a8bc436fa10842e06a80b14a81.png)
 
 ### UTXO Chain Client[​](#utxo-chain-client "Direct link to UTXO Chain Client")
 
@@ -314,7 +314,7 @@ Regularly retrieves new Bitcoin blocks and alerts the observer about transaction
 
 More on the [UTXO transaction format](https://developer.bitcoin.org/reference/transactions.html#raw-transaction-format)
 
-![utxo\_scanner\_flow](/docs/assets/images/utxo_observer_flow-8a5500d7bb3aa54325f59339cdde09d0.png)
+![utxo\_scanner\_flow](./docs/assets/images/utxo_observer_flow-8a5500d7bb3aa54325f59339cdde09d0.png)
 
 #### Reorganisation[​](#reorganisation "Direct link to Reorganisation")
 
@@ -330,7 +330,7 @@ In case of the chain reorganisation the next flow should be applied:
 
 3. Re-scan each block at every affected height.
 
-![utxo\_reorg\_flow](/docs/assets/images/utxo_reorg_flow-94f687f56ed6ba3a488bcec00044a783.png)
+![utxo\_reorg\_flow](./docs/assets/images/utxo_reorg_flow-94f687f56ed6ba3a488bcec00044a783.png)
 
 ### Int3face Chain Client[​](#int3face-chain-client "Direct link to Int3face Chain Client")
 
@@ -358,7 +358,7 @@ Allows signing and broadcasting transactions with `MsgInboundTransfer` messages 
 
 6. [Broadcast](https://buf.build/cosmos/cosmos-sdk/docs/main:cosmos.tx.v1beta1#cosmos.tx.v1beta1.Service.BroadcastTx) transaction to the chain.
 
-![int3face\_broadcast](/docs/assets/images/int3face_broadcast-167e05576a9e0b7b91f9c16d3b88f8f2.png)
+![int3face\_broadcast](./docs/assets/images/int3face_broadcast-167e05576a9e0b7b91f9c16d3b88f8f2.png)
 
 #### Int3face chain observer[​](#int3face-chain-observer "Direct link to Int3face chain observer")
 
@@ -374,7 +374,7 @@ Subscribes to the `NewBlockEvent`s from the Int3face chain and notifies the **ob
 
 * Notify the **observer** about every found outbound message.
 
-![int3face\_scanner\_flow](/docs/assets/images/int3face_observer_flow-0fd2f23e71791f9a046a596745090a82.png)
+![int3face\_scanner\_flow](./docs/assets/images/int3face_observer_flow-0fd2f23e71791f9a046a596745090a82.png)
 
 ### Quarantine[​](#quarantine-1 "Direct link to Quarantine")
 
@@ -386,7 +386,7 @@ There are two methods for managing quarantined assets:
 
 * Minting all coins to a special **quarantine** address (not the destination address) immediately after finalization. The coins are then transferred to their intended addresses upon release following a governance proposal. This method still requires the state queue, but operations are based solely on straightforward transfers. It also offers a transparent view of the **quarantine**, represented by a dedicated **quarantine** vault on Int3face.
 
-![quarantine](/docs/assets/images/quarantine-e9ed906f64712730aab51ec82e47eecc.png)
+![quarantine](./docs/assets/images/quarantine-e9ed906f64712730aab51ec82e47eecc.png)
 
 For **quarantining**, a queue is utilized instead of a map to allow sequential execution of transfers and to potentially filter out malicious transactions. To better understand the difference, consider the following example.
 
@@ -484,7 +484,7 @@ Each validator invokes this method when processing the **MsgInboundTransfer** me
 
 The diagram below shows the detailed workflow for processing the **MsgInboundTransfer**.
 
-![workflow](/docs/assets/images/inbound_tranfer_workflow-0c656994df8fd0521426642bd5af76e1.png)
+![workflow](./docs/assets/images/inbound_tranfer_workflow-0c656994df8fd0521426642bd5af76e1.png)
 
 ### OutboundTransfer[​](#outboundtransfer "Direct link to OutboundTransfer")
 
