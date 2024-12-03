@@ -393,13 +393,45 @@ For **quarantining**, a queue is utilized instead of a map to allow sequential e
 Suppose transfers are stored in a map. In this case, when releasing assets from the **quarantining** vault, the only available figure is the total volume of transfers to addresses, as depicted in the following diagram:
 
 ```
-Alice_destination_addr -> 9 + 7 + 3 = 19...Bob_destination_addr   -> 1 + 2 = 3...
+Alice_destination_addr -> 9 + 7 + 3 = 19
+...
+Bob_destination_addr   -> 1 + 2 = 3
+...
 ```
 
 Conversely, when using a queue, the same data might be represented as follows:
 
 ```
-[  {    dest  : Alice_destination_addr    amount: 9    height: 2  }  {    dest  : Alice_destination_addr    amount: 7    height: 1  }  {    dest  : Alice_destination_addr    amount: 3    height: 6  }  ...    {    dest  : Bob_destination_addr    amount: 1    height: 2  }  {    dest  : Bob_destination_addr    amount: 2    height: 8  }  ...]
+[
+  {
+    dest  : Alice_destination_addr
+    amount: 9
+    height: 2
+  }
+  {
+    dest  : Alice_destination_addr
+    amount: 7
+    height: 1
+  }
+  {
+    dest  : Alice_destination_addr
+    amount: 3
+    height: 6
+  }
+  ...
+  
+  {
+    dest  : Bob_destination_addr
+    amount: 1
+    height: 2
+  }
+  {
+    dest  : Bob_destination_addr
+    amount: 2
+    height: 8
+  }
+  ...
+]
 ```
 
 Imagine the module detects unusual activity at height 6. It could then decide to mint all coins except those associated with that specific height. It's important to note that the order of elements in the queue is not significant. The queue is merely a practical data structure for storage purposes.
@@ -424,8 +456,38 @@ When accepting the inbound transfer, the new `InboundTransfer` record in the sta
 
 * Inbound transfer: `0x01 | external_id | external height -> ProtocolBuffer(InboundTransfer)`
 
-```
-// InboundTransfer is a representation of the inbound transfer.message InboundTransfer {  // ExternalId is a unique ID of the transfer coming from outside.  // Serves the purpose of uniquely identifying the transfer in another chain  // (e.g., this might be the BTC tx hash).  string external_id = 1 [ (gogoproto.moretags) = "yaml:\"external_id\"" ];  // ExternalHeight is the height at which the transfer occurred in the external  // chain  uint64 external_height = 2  [ (gogoproto.moretags) = "yaml:\"external_height\"" ];  // DestAddr is a destination Int3face address  string dest_addr = 3 [ (gogoproto.moretags) = "yaml:\"dest_addr\"" ];  // AssetID is the ID of the asset being transferred  AssetID asset_id = 4 [  (gogoproto.moretags) = "yaml:\"asset_id\"",  (gogoproto.nullable) = false  ];  // Amount of coins to transfer  string amount = 5 [  (gogoproto.moretags) = "yaml:\"amount\"",  (gogoproto.customtype) = "cosmossdk.io/math.Int",  (gogoproto.nullable) = false  ];  // Voters is a list of validators signed this transfer  repeated string voters = 6 [ (gogoproto.moretags) = "yaml:\"voters\"" ];  // Finalized indicates whether the transfer needs more votes or has  // already accumulated a sufficient number. The finalised flag is set  // to true as soon as length(voters) is greater than or equal to  // the module's param votes_needed.  bool finalized = 7 [ (gogoproto.moretags) = "yaml:\"finalized\"" ];}
+```protobuf
+// InboundTransfer is a representation of the inbound transfer.
+message InboundTransfer {
+  // ExternalId is a unique ID of the transfer coming from outside.
+  // Serves the purpose of uniquely identifying the transfer in another chain
+  // (e.g., this might be the BTC tx hash).
+  string external_id = 1 [ (gogoproto.moretags) = "yaml:\"external_id\"" ];
+  // ExternalHeight is the height at which the transfer occurred in the external
+  // chain
+  uint64 external_height = 2
+  [ (gogoproto.moretags) = "yaml:\"external_height\"" ];
+  // DestAddr is a destination Int3face address
+  string dest_addr = 3 [ (gogoproto.moretags) = "yaml:\"dest_addr\"" ];
+  // AssetID is the ID of the asset being transferred
+  AssetID asset_id = 4 [
+  (gogoproto.moretags) = "yaml:\"asset_id\"",
+  (gogoproto.nullable) = false
+  ];
+  // Amount of coins to transfer
+  string amount = 5 [
+  (gogoproto.moretags) = "yaml:\"amount\"",
+  (gogoproto.customtype) = "cosmossdk.io/math.Int",
+  (gogoproto.nullable) = false
+  ];
+  // Voters is a list of validators signed this transfer
+  repeated string voters = 6 [ (gogoproto.moretags) = "yaml:\"voters\"" ];
+  // Finalized indicates whether the transfer needs more votes or has
+  // already accumulated a sufficient number. The finalised flag is set
+  // to true as soon as length(voters) is greater than or equal to
+  // the module's param votes_needed.
+  bool finalized = 7 [ (gogoproto.moretags) = "yaml:\"finalized\"" ];
+}
 ```
 
 ### Finalized transfer[​](#finalized-transfer "Direct link to Finalized transfer")
@@ -444,14 +506,71 @@ The mapping of the asset ID to the block height on the external chain at which t
 
 Module parameters are stored in the dedicated params subspace by the `bridge` store key. Params can be updated with governance or the address with authority.
 
-```
-// Params defines params for x/bridge module.message Params {  // Signers used to sign inbound and release outbound transactions  repeated string signers = 1 [ (gogoproto.moretags) = "yaml:\"signers\"" ];  // Assets is a list used to create tokenfactory denoms  // for corresponding trading pairs  repeated Asset assets = 2 [    (gogoproto.moretags) = "yaml:\"assets\"",    (gogoproto.nullable) = false  ];  // VotesNeeded marks how many signers out of the list of signers need  // to sign until a tx can be considered finalized  uint64 votes_needed = 3 [ (gogoproto.moretags) = "yaml:\"votes_needed\"" ];  // Fee defines a param for fee that go towards the validator set  // signing the incoming/outgoing txs. The fee is measured as a ratio,  // so its value lies between 0 and 1.  string fee = 4 [    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",    (gogoproto.moretags) = "yaml:\"fee\"",    (gogoproto.nullable) = false  ];}
+```protobuf
+// Params defines params for x/bridge module.
+message Params {
+  // Signers used to sign inbound and release outbound transactions
+  repeated string signers = 1 [ (gogoproto.moretags) = "yaml:\"signers\"" ];
+  // Assets is a list used to create tokenfactory denoms
+  // for corresponding trading pairs
+  repeated Asset assets = 2 [
+    (gogoproto.moretags) = "yaml:\"assets\"",
+    (gogoproto.nullable) = false
+  ];
+  // VotesNeeded marks how many signers out of the list of signers need
+  // to sign until a tx can be considered finalized
+  uint64 votes_needed = 3 [ (gogoproto.moretags) = "yaml:\"votes_needed\"" ];
+  // Fee defines a param for fee that go towards the validator set
+  // signing the incoming/outgoing txs. The fee is measured as a ratio,
+  // so its value lies between 0 and 1.
+  string fee = 4 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.moretags) = "yaml:\"fee\"",
+    (gogoproto.nullable) = false
+  ];
+}
 ```
 
 Params include information about all available assets.
 
-```
-// AssetID defines a pair of the source chain name and its Osmosis// representation denoted by denom. AssetID is a primary key for Asset.message AssetID {  // SourceChain is a source chain name  string source_chain = 1 [ (gogoproto.moretags) = "yaml:\"source_chain\"" ];  // Denom is the Osmosis representation of the SourceChain  string denom = 2 [ (gogoproto.moretags) = "yaml:\"denom\"" ];}// Asset is a representation of the asset.message Asset {  // ID is the asset's primary key  AssetID id = 1      [ (gogoproto.moretags) = "yaml:\"id\"", (gogoproto.nullable) = false ];  // Status is a current status of the asset  AssetStatus status = 2 [ (gogoproto.moretags) = "yaml:\"status\"" ];  // Exponent represents the power of 10 used for coin representation  uint64 exponent = 3 [ (gogoproto.moretags) = "yaml:\"exponent\"" ];  // ExternalConfirmations is a number of the confirmations on the external  // chain needed to consider the transfer confirmed  uint64 external_confirmations = 4      [ (gogoproto.moretags) = "yaml:\"external_confirmations\"" ];  // Minimal amount of tokens for transfer  string min_transfer_amount = 5 [    (gogoproto.moretags) = "yaml:\"min_transfer_amount\"",    (gogoproto.customtype) = "cosmossdk.io/math.Int",    (gogoproto.nullable) = false  ];}enum AssetStatus {  ASSET_STATUS_UNSPECIFIED = 0;  ASSET_STATUS_OK = 1;  ASSET_STATUS_BLOCKED_INBOUND = 2;  ASSET_STATUS_BLOCKED_OUTBOUND = 3;  ASSET_STATUS_BLOCKED_BOTH = 4;}
+```protobuf
+// AssetID defines a pair of the source chain name and its Osmosis
+// representation denoted by denom. AssetID is a primary key for Asset.
+message AssetID {
+  // SourceChain is a source chain name
+  string source_chain = 1 [ (gogoproto.moretags) = "yaml:\"source_chain\"" ];
+  // Denom is the Osmosis representation of the SourceChain
+  string denom = 2 [ (gogoproto.moretags) = "yaml:\"denom\"" ];
+}
+
+// Asset is a representation of the asset.
+message Asset {
+  // ID is the asset's primary key
+  AssetID id = 1
+      [ (gogoproto.moretags) = "yaml:\"id\"", (gogoproto.nullable) = false ];
+  // Status is a current status of the asset
+  AssetStatus status = 2 [ (gogoproto.moretags) = "yaml:\"status\"" ];
+  // Exponent represents the power of 10 used for coin representation
+  uint64 exponent = 3 [ (gogoproto.moretags) = "yaml:\"exponent\"" ];
+  // ExternalConfirmations is a number of the confirmations on the external
+  // chain needed to consider the transfer confirmed
+  uint64 external_confirmations = 4
+      [ (gogoproto.moretags) = "yaml:\"external_confirmations\"" ];
+  // Minimal amount of tokens for transfer
+  string min_transfer_amount = 5 [
+    (gogoproto.moretags) = "yaml:\"min_transfer_amount\"",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+}
+
+enum AssetStatus {
+  ASSET_STATUS_UNSPECIFIED = 0;
+  ASSET_STATUS_OK = 1;
+  ASSET_STATUS_BLOCKED_INBOUND = 2;
+  ASSET_STATUS_BLOCKED_OUTBOUND = 3;
+  ASSET_STATUS_BLOCKED_BOTH = 4;
+}
 ```
 
 ## Query server[​](#query-server "Direct link to Query server")
@@ -460,16 +579,39 @@ Params include information about all available assets.
 
 This method is used for getting module parameters.
 
-```
-// QueryParamsRequest is the request type for the Query/Params RPC method.message QueryParamsRequest {}// QueryParamsResponse is the response type for the Query/Params RPC method.message QueryParamsResponse {  Params params = 1 [    (gogoproto.moretags) = "yaml:\"params\"",    (gogoproto.nullable) = false  ];}
+```protobuf
+// QueryParamsRequest is the request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is the response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  Params params = 1 [
+    (gogoproto.moretags) = "yaml:\"params\"",
+    (gogoproto.nullable) = false
+  ];
+}
 ```
 
 ### LastTransferHeight[​](#lasttransferheight "Direct link to LastTransferHeight")
 
 This method allows getting the last transfer height for the provided asset.
 
-```
-// LastTransferHeightRequest is the request type for the// Query/LastTransferHeight RPC method.message LastTransferHeightRequest {  AssetID asset_id = 1 [    (gogoproto.moretags) = "yaml:\"asset_id\"",    (gogoproto.nullable) = false  ];}// LastTransferHeightResponse is the response type for the// Query/LastTransferHeight RPC method.message LastTransferHeightResponse {  uint64 last_transfer_height = 1      [ (gogoproto.moretags) = "yaml:\"last_transfer_height\"" ];}
+```protobuf
+// LastTransferHeightRequest is the request type for the
+// Query/LastTransferHeight RPC method.
+message LastTransferHeightRequest {
+  AssetID asset_id = 1 [
+    (gogoproto.moretags) = "yaml:\"asset_id\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// LastTransferHeightResponse is the response type for the
+// Query/LastTransferHeight RPC method.
+message LastTransferHeightResponse {
+  uint64 last_transfer_height = 1
+      [ (gogoproto.moretags) = "yaml:\"last_transfer_height\"" ];
+}
 ```
 
 ## Message server[​](#message-server "Direct link to Message server")
@@ -478,8 +620,40 @@ This method allows getting the last transfer height for the provided asset.
 
 Each validator invokes this method when processing the **MsgInboundTransfer** message. This message contains all information about the transfer, including the unique primary key from the external chain, such as the Bitcoin transaction hash, and the external chain height at which the transfer was witnessed. This method can be called only by the members of the **super valset**.
 
-```
-// MsgInboundTransfer defines the message structure for the InboundTransfer gRPC// service method. It allows a sender to perform an inbound cross-chain// transfer, i.e., to transfer their tokens from the source chain to Int3face and// get the equivalent amount of the corresponding token (specified in subdenom)// on Int3face in return. The tokens are minted through the x/tokenfactory module// to the destination address.message MsgInboundTransfer {  option (amino.name) = "int3face/bridge/inbound-transfer";  // ExternalId is a unique ID of the transfer coming from outside.  // Serves the purpose of uniquely identifying the transfer in another chain  // (e.g., this might be the BTC tx hash)  string external_id = 1 [ (gogoproto.moretags) = "yaml:\"external_id\"" ];  // ExternalHeight is the height at which the transfer occurred in the external  // chain  uint64 external_height = 2      [ (gogoproto.moretags) = "yaml:\"external_height\"" ];  // Sender is a sender's address  string sender = 3 [ (gogoproto.moretags) = "yaml:\"sender\"" ];  // DestAddr is a destination Int3face address  string dest_addr = 4 [ (gogoproto.moretags) = "yaml:\"dest_addr\"" ];  // AssetID is the ID of the asset being transferred  AssetID asset_id = 5 [    (gogoproto.moretags) = "yaml:\"asset_id\"",    (gogoproto.nullable) = false  ];  // Amount of coins to transfer  string amount = 6 [    (gogoproto.moretags) = "yaml:\"amount\"",    (gogoproto.customtype) = "cosmossdk.io/math.Int",    (gogoproto.nullable) = false  ];}
+```protobuf
+// MsgInboundTransfer defines the message structure for the InboundTransfer gRPC
+// service method. It allows a sender to perform an inbound cross-chain
+// transfer, i.e., to transfer their tokens from the source chain to Int3face and
+// get the equivalent amount of the corresponding token (specified in subdenom)
+// on Int3face in return. The tokens are minted through the x/tokenfactory module
+// to the destination address.
+message MsgInboundTransfer {
+  option (amino.name) = "int3face/bridge/inbound-transfer";
+
+  // ExternalId is a unique ID of the transfer coming from outside.
+  // Serves the purpose of uniquely identifying the transfer in another chain
+  // (e.g., this might be the BTC tx hash)
+  string external_id = 1 [ (gogoproto.moretags) = "yaml:\"external_id\"" ];
+  // ExternalHeight is the height at which the transfer occurred in the external
+  // chain
+  uint64 external_height = 2
+      [ (gogoproto.moretags) = "yaml:\"external_height\"" ];
+  // Sender is a sender's address
+  string sender = 3 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  // DestAddr is a destination Int3face address
+  string dest_addr = 4 [ (gogoproto.moretags) = "yaml:\"dest_addr\"" ];
+  // AssetID is the ID of the asset being transferred
+  AssetID asset_id = 5 [
+    (gogoproto.moretags) = "yaml:\"asset_id\"",
+    (gogoproto.nullable) = false
+  ];
+  // Amount of coins to transfer
+  string amount = 6 [
+    (gogoproto.moretags) = "yaml:\"amount\"",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+}
 ```
 
 The diagram below shows the detailed workflow for processing the **MsgInboundTransfer**.
@@ -490,48 +664,142 @@ The diagram below shows the detailed workflow for processing the **MsgInboundTra
 
 Clients call this method when transferring tokens to the external chain.
 
-```
-// MsgOutboundTransfer defines the message structure for the OutboundTransfer// gRPC service method. It allows a sender to perform an outbound cross-chain// transfer, i.e., to transfer their tokens from Int3face to the destination// chain. The tokens are burned through the x/tokenfactory module from the// sender's address.message MsgOutboundTransfer {  option (amino.name) = "int3face/bridge/outbound-transfer";  // Sender is a sender's Int3face address  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];  // DestAddr is a destination address  string dest_addr = 2 [ (gogoproto.moretags) = "yaml:\"dest_addr\"" ];  // AssetID is the ID of the asset being transferred  AssetID asset_id = 3 [    (gogoproto.moretags) = "yaml:\"asset_id\"",    (gogoproto.nullable) = false  ];  // Amount of coins to transfer  string amount = 4 [    (gogoproto.moretags) = "yaml:\"amount\"",    (gogoproto.customtype) = "cosmossdk.io/math.Int",    (gogoproto.nullable) = false  ];}
+```protobuf
+// MsgOutboundTransfer defines the message structure for the OutboundTransfer
+// gRPC service method. It allows a sender to perform an outbound cross-chain
+// transfer, i.e., to transfer their tokens from Int3face to the destination
+// chain. The tokens are burned through the x/tokenfactory module from the
+// sender's address.
+message MsgOutboundTransfer {
+  option (amino.name) = "int3face/bridge/outbound-transfer";
+
+  // Sender is a sender's Int3face address
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  // DestAddr is a destination address
+  string dest_addr = 2 [ (gogoproto.moretags) = "yaml:\"dest_addr\"" ];
+  // AssetID is the ID of the asset being transferred
+  AssetID asset_id = 3 [
+    (gogoproto.moretags) = "yaml:\"asset_id\"",
+    (gogoproto.nullable) = false
+  ];
+  // Amount of coins to transfer
+  string amount = 4 [
+    (gogoproto.moretags) = "yaml:\"amount\"",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+}
 ```
 
 ### UpdateParams[​](#updateparams "Direct link to UpdateParams")
 
 The method to update module params. Params can be updated with governance or the address with authority.
 
-```
-// MsgUpdateParams allows to update module params. It contains UpdateParams// instead of just Params to forbid status updating using this method.// All new assets introduced with this method have ASSET_STATUS_BLOCKED_BOTH// status by default.message MsgUpdateParams {  option (amino.name) = "int3face/bridge/update-params";  // Sender is a sender's address  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];  // NewParams should be fully populated  Params new_params = 2 [    (gogoproto.moretags) = "yaml:\"new_params\"",    (gogoproto.nullable) = false  ];}
+```protobuf
+// MsgUpdateParams allows to update module params. It contains UpdateParams
+// instead of just Params to forbid status updating using this method.
+// All new assets introduced with this method have ASSET_STATUS_BLOCKED_BOTH
+// status by default.
+message MsgUpdateParams {
+  option (amino.name) = "int3face/bridge/update-params";
+
+  // Sender is a sender's address
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  // NewParams should be fully populated
+  Params new_params = 2 [
+    (gogoproto.moretags) = "yaml:\"new_params\"",
+    (gogoproto.nullable) = false
+  ];
+}
 ```
 
 ### ChangeAssetStatus[​](#changeassetstatus "Direct link to ChangeAssetStatus")
 
 This method allows updating the status of the given asset. Only members of the **super valset** can invoke this method.
 
-```
-// MsgChangeAssetStatus changes the status of the provided asset.message MsgChangeAssetStatus {  option (amino.name) = "int3face/bridge/change-asset-status";  // Sender is a sender's address  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];  // AssetID is the ID of the asset to update.  // The asset should be known; otherwise, the method will failed.  AssetID asset_id = 2 [    (gogoproto.moretags) = "yaml:\"asset_id\"",    (gogoproto.nullable) = false  ];  // NewStatus is a new asset's status.  AssetStatus new_status = 3 [ (gogoproto.moretags) = "yaml:\"new_status\"" ];}
+```protobuf
+// MsgChangeAssetStatus changes the status of the provided asset.
+message MsgChangeAssetStatus {
+  option (amino.name) = "int3face/bridge/change-asset-status";
+
+  // Sender is a sender's address
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  // AssetID is the ID of the asset to update.
+  // The asset should be known; otherwise, the method will failed.
+  AssetID asset_id = 2 [
+    (gogoproto.moretags) = "yaml:\"asset_id\"",
+    (gogoproto.nullable) = false
+  ];
+  // NewStatus is a new asset's status.
+  AssetStatus new_status = 3 [ (gogoproto.moretags) = "yaml:\"new_status\"" ];
+}
 ```
 
 ## Events[​](#events "Direct link to Events")
 
 ### EventInboundTransfer[​](#eventinboundtransfer "Direct link to EventInboundTransfer")
 
-```
-message EventInboundTransfer {  // Sender is a sender's address  string sender = 1;  // DestAddr is a destination Int3face address  string dest_addr = 2;  // AssetID is the ID of the asset being transferred  AssetID asset_id = 3 [ (gogoproto.nullable) = false ];  // Amount of coins to transfer  string amount = 4 [    (gogoproto.customtype) = "cosmossdk.io/math.Int",    (gogoproto.nullable) = false  ];}
+``` protobuf
+message EventInboundTransfer {
+  // Sender is a sender's address
+  string sender = 1;
+  // DestAddr is a destination Int3face address
+  string dest_addr = 2;
+  // AssetID is the ID of the asset being transferred
+  AssetID asset_id = 3 [ (gogoproto.nullable) = false ];
+  // Amount of coins to transfer
+  string amount = 4 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+}
 ```
 
 ### EventOutboundTransfer[​](#eventoutboundtransfer "Direct link to EventOutboundTransfer")
 
-```
-message EventOutboundTransfer {  // Sender is a sender's address  string sender = 1;  // DestAddr is a destination Int3face address  string dest_addr = 2;  // AssetID is the ID of the asset being transferred  AssetID asset_id = 3 [ (gogoproto.nullable) = false ];  // Amount of coins to transfer  string amount = 4 [    (gogoproto.customtype) = "cosmossdk.io/math.Int",    (gogoproto.nullable) = false  ];}
+``` protobuf
+message EventOutboundTransfer {
+  // Sender is a sender's address
+  string sender = 1;
+  // DestAddr is a destination Int3face address
+  string dest_addr = 2;
+  // AssetID is the ID of the asset being transferred
+  AssetID asset_id = 3 [ (gogoproto.nullable) = false ];
+  // Amount of coins to transfer
+  string amount = 4 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+}
 ```
 
 ### EventUpdateParams[​](#eventupdateparams "Direct link to EventUpdateParams")
 
-```
-message EventUpdateParams {  repeated string new_signers = 1;  repeated string created_signers = 2;  repeated string deleted_signers = 3;  repeated Asset new_assets = 4 [ (gogoproto.nullable) = false ];  repeated Asset created_assets = 5 [ (gogoproto.nullable) = false ];  repeated Asset deleted_assets = 6 [ (gogoproto.nullable) = false ];  uint64 new_votes_needed = 7;  string new_fee = 8 [    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",    (gogoproto.nullable) = false  ];}
+``` protobuf
+message EventUpdateParams {
+  repeated string new_signers = 1;
+  repeated string created_signers = 2;
+  repeated string deleted_signers = 3;
+
+  repeated Asset new_assets = 4 [ (gogoproto.nullable) = false ];
+  repeated Asset created_assets = 5 [ (gogoproto.nullable) = false ];
+  repeated Asset deleted_assets = 6 [ (gogoproto.nullable) = false ];
+
+  uint64 new_votes_needed = 7;
+  string new_fee = 8 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}
 ```
 
 ### EventChangeAssetStatus[​](#eventchangeassetstatus "Direct link to EventChangeAssetStatus")
 
-```
-message EventChangeAssetStatus {  string sender = 1;  AssetID asset_id = 2 [ (gogoproto.nullable) = false ];  AssetStatus old_status = 3;  AssetStatus new_status = 4;}
+``` protobuf
+message EventChangeAssetStatus {
+  string sender = 1;
+  AssetID asset_id = 2 [ (gogoproto.nullable) = false ];
+  AssetStatus old_status = 3;
+  AssetStatus new_status = 4;
+}
 ```

@@ -13,8 +13,11 @@ On this page
 
 Creates a denom of `factory/{creator address}/{subdenom}` given the denom creator address and the subdenom. Subdenoms can contain `[a-zA-Z0-9./]`.
 
-```
-message MsgCreateDenom {  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];  string subdenom = 2 [ (gogoproto.moretags) = "yaml:\"subdenom\"" ];}
+``` {.go}
+message MsgCreateDenom {
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  string subdenom = 2 [ (gogoproto.moretags) = "yaml:\"subdenom\"" ];
+}
 ```
 
 **State Modifications:**
@@ -29,8 +32,14 @@ message MsgCreateDenom {  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sen
 
 Minting of a specific denom is only allowed for the creator of the denom registered during `CreateDenom`
 
-```
-message MsgMint {  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];  cosmos.base.v1beta1.Coin amount = 2 [    (gogoproto.moretags) = "yaml:\"amount\"",    (gogoproto.nullable) = false  ];}
+``` {.go}
+message MsgMint {
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  cosmos.base.v1beta1.Coin amount = 2 [
+    (gogoproto.moretags) = "yaml:\"amount\"",
+    (gogoproto.nullable) = false
+  ];
+}
 ```
 
 **State Modifications:**
@@ -46,8 +55,14 @@ message MsgMint {  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" 
 
 Burning of a specific denom is only allowed for the creator of the denom registered during `CreateDenom`
 
-```
-message MsgBurn {  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];  cosmos.base.v1beta1.Coin amount = 2 [    (gogoproto.moretags) = "yaml:\"amount\"",    (gogoproto.nullable) = false  ];}
+``` {.go}
+message MsgBurn {
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  cosmos.base.v1beta1.Coin amount = 2 [
+    (gogoproto.moretags) = "yaml:\"amount\"",
+    (gogoproto.nullable) = false
+  ];
+}
 ```
 
 **State Modifications:**
@@ -63,8 +78,20 @@ message MsgBurn {  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" 
 
 Force transferring of a specific denom is only allowed for the creator of the denom registered during `CreateDenom`.
 
-```
-message MsgForceTransfer {  option (amino.name) = "osmosis/tokenfactory/force-transfer";  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];  cosmos.base.v1beta1.Coin amount = 2 [    (gogoproto.moretags) = "yaml:\"amount\"",    (gogoproto.nullable) = false  ];  string transferFromAddress = 3  [ (gogoproto.moretags) = "yaml:\"transfer_from_address\"" ];  string transferToAddress = 4  [ (gogoproto.moretags) = "yaml:\"transfer_to_address\"" ];}
+``` {.go}
+message MsgForceTransfer {
+  option (amino.name) = "osmosis/tokenfactory/force-transfer";
+
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  cosmos.base.v1beta1.Coin amount = 2 [
+    (gogoproto.moretags) = "yaml:\"amount\"",
+    (gogoproto.nullable) = false
+  ];
+  string transferFromAddress = 3
+  [ (gogoproto.moretags) = "yaml:\"transfer_from_address\"" ];
+  string transferToAddress = 4
+  [ (gogoproto.moretags) = "yaml:\"transfer_to_address\"" ];
+}
 ```
 
 **State Modifications:**
@@ -80,16 +107,28 @@ message MsgForceTransfer {  option (amino.name) = "osmosis/tokenfactory/force-tr
 
 Change the admin of a denom. Note, this is only allowed to be called by the current admin of the denom.
 
-```
-message MsgChangeAdmin {  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];  string denom = 2 [ (gogoproto.moretags) = "yaml:\"denom\"" ];  string newAdmin = 3 [ (gogoproto.moretags) = "yaml:\"new_admin\"" ];}
+```go
+message MsgChangeAdmin {
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  string denom = 2 [ (gogoproto.moretags) = "yaml:\"denom\"" ];
+  string newAdmin = 3 [ (gogoproto.moretags) = "yaml:\"new_admin\"" ];
+}
 ```
 
 ### SetDenomMetadata[​](#setdenommetadata "Direct link to SetDenomMetadata")
 
 Setting of metadata for a specific denom is only allowed for the admin of the denom. It allows the overwriting of the denom metadata in the bank module.
 
-```
-// MsgSetDenomMetadata is the sdk.Msg type for allowing an admin account to set// the denom's bank metadatamessage MsgSetDenomMetadata {  string sender = 1 [(gogoproto.moretags) = "yaml:\"sender\""];  cosmos.bank.v1beta1.Metadata metadata = 2 [  (gogoproto.moretags) = "yaml:\"metadata\"",  (gogoproto.nullable) = false  ];}
+```go
+// MsgSetDenomMetadata is the sdk.Msg type for allowing an admin account to set
+// the denom's bank metadata
+message MsgSetDenomMetadata {
+  string sender = 1 [(gogoproto.moretags) = "yaml:\"sender\""];
+  cosmos.bank.v1beta1.Metadata metadata = 2 [
+  (gogoproto.moretags) = "yaml:\"metadata\"",
+  (gogoproto.nullable) = false
+  ];
+}
 ```
 
 **State Modifications:**
@@ -101,8 +140,15 @@ Setting of metadata for a specific denom is only allowed for the admin of the de
 
 Allowing to assign a CosmWasm contract to call with a BeforeSend hook for a specific denom is only allowed for the creator of the denom registered during `CreateDenom`.
 
-```
-message MsgSetBeforeSendHook {  option (amino.name) = "osmosis/tokenfactory/set-beforesend-hook";  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];  string denom = 2 [ (gogoproto.moretags) = "yaml:\"denom\"" ];  string contract_addr = 3  [ (gogoproto.moretags) = "yaml:\"contract_addr\"" ];}
+``` {.go}
+message MsgSetBeforeSendHook {
+  option (amino.name) = "osmosis/tokenfactory/set-beforesend-hook";
+
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  string denom = 2 [ (gogoproto.moretags) = "yaml:\"denom\"" ];
+  string contract_addr = 3
+  [ (gogoproto.moretags) = "yaml:\"contract_addr\"" ];
+}
 ```
 
 **State Modifications:**
@@ -118,8 +164,11 @@ message MsgSetBeforeSendHook {  option (amino.name) = "osmosis/tokenfactory/set-
 
 Updates [params](/docs/neutron/modules/3rdparty/osmosis/tokenfactory/params) of the module.
 
-```
-message MsgChangeAdmin {  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];  cosmos.bank.v1beta1.Metadata metadata = 2 [ (gogoproto.moretags) = "yaml:\"metadata\"", (gogoproto.nullable)   = false ];}
+```go
+message MsgChangeAdmin {
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  cosmos.bank.v1beta1.Metadata metadata = 2 [ (gogoproto.moretags) = "yaml:\"metadata\"", (gogoproto.nullable)   = false ];
+}
 ```
 
 **State Modifications:**

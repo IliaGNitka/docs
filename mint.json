@@ -21,192 +21,92 @@
             "docs/int3face/build-and-run/doge_deploy",
             "docs/int3face/build-and-run/ltc_deploy"
           ]
+        },
+        {
+          "group": "Tokenomics",
+          "pages": [
+            "docs/int3face/tokenomics/overview"
+          ]
         }
       ]
     },
     {
-      "group": "Overview",
+      "group": "Modules",
       "pages": [
-        "docs/int3face/tokenomics/overview"
+        {
+          "group": "Bridge",
+          "pages": [
+            "docs/int3face/modules/bridge/overview"
+          ]
+        },
+        {
+          "group": "IBC Rate limit",
+          "pages": [
+            "docs/int3face/modules/ibcratelimit/overview"
+          ]
+        },
+        {
+          "group": "Cross-chain Rate limit",
+          "pages": [
+            "docs/int3face/modules/ratelimit/overview"
+          ]
+        },
+        {
+          "group": "Quarantine",
+          "pages": [
+            "docs/int3face/modules/quarantine/overview"
+          ]
+        },
+        {
+          "group": "Token factory",
+          "pages": [
+            "docs/int3face/modules/tokenfactory/overview",
+            "docs/int3face/modules/tokenfactory/messages",
+            "docs/int3face/modules/tokenfactory/params"
+          ]
+        }
       ]
     },
     {
-      "group": "Overview",
+      "group": "Comparisons",
       "pages": [
-        "docs/int3face/modules/bridge/overview"
-      ]
-    },
-    {
-      "group": "Overview",
-      "pages": [
-        "docs/int3face/modules/ibcratelimit/overview"
-      ]
-    },
-    {
-      "group": "Overview",
-      "pages": [
-        "docs/int3face/modules/ratelimit/overview"
-      ]
-    },
-    {
-      "group": "Overview",
-      "pages": [
-        "docs/int3face/modules/quarantine/overview"
-      ]
-    },
-    {
-      "group": "Overview",
-      "pages": [
-        "docs/int3face/modules/tokenfactory/overview"
-      ]
-    },
-    {
-      "group": "Messages",
-      "pages": [
-        "docs/int3face/modules/tokenfactory/messages"
-      ]
-    },
-    {
-      "group": "Params",
-      "pages": [
-        "docs/int3face/modules/tokenfactory/params"
-      ]
-    },
-    {
-      "group": "Int3face THOR Zeta",
-      "pages": [
-        "docs/comparisons/Int3face-THOR-Zeta"
-      ]
-    },
-    {
-      "group": "TBTC IBTC NBTC",
-      "pages": [
-        "docs/comparisons/tBTC-iBTC-nBTC"
-      ]
-    },
-    {
-      "group": "TBTC IBTC NBTC Tech",
-      "pages": [
+        "docs/comparisons/Int3face-THOR-Zeta",
+        "docs/comparisons/tBTC-iBTC-nBTC",
         "docs/comparisons/tBTC-iBTC-nBTC-tech"
       ]
     },
     {
-      "group": "Mainnet",
+      "group": "Deployments",
       "pages": [
-        "docs/deployment/mainnet"
-      ]
-    },
-    {
-      "group": "Testnet",
-      "pages": [
+        "docs/deployment/mainnet",
         "docs/deployment/testnet"
       ]
     },
     {
-      "group": "Btc Inbound Outbound",
+      "group": "Demos",
       "pages": [
-        "docs/demos/btc/btc_inbound_outbound"
-      ]
-    },
-    {
-      "group": "Doge Inbound Outbound",
-      "pages": [
-        "docs/demos/doge/doge_inbound_outbound"
-      ]
-    },
-    {
-      "group": "Ton Inbound Outbound",
-      "pages": [
-        "docs/demos/ton/ton_inbound_outbound"
-      ]
-    },
-    {
-      "group": "Doge Transfers Example",
-      "pages": [
+        "docs/demos/btc/btc_inbound_outbound",
+        "docs/demos/doge/doge_inbound_outbound",
+        "docs/demos/ton/ton_inbound_outbound",
         "docs/demos/mainnet/transfers/doge-transfers-example"
       ]
     },
     {
-      "group": "Adr 001 Grace Period",
+      "group": "ADR",
       "pages": [
-        "docs/ADR/adr-001-grace-period"
-      ]
-    },
-    {
-      "group": "Adr 002 Dynamic Committee",
-      "pages": [
-        "docs/ADR/adr-002-dynamic-committee"
-      ]
-    },
-    {
-      "group": "Adr 003 Babylon",
-      "pages": [
-        "docs/ADR/adr-003-babylon"
-      ]
-    },
-    {
-      "group": "Adr 004 Solana Integration",
-      "pages": [
-        "docs/ADR/adr-004-solana-integration"
-      ]
-    },
-    {
-      "group": "Adr 005 Ordinals",
-      "pages": [
-        "docs/ADR/adr-005-ordinals"
-      ]
-    },
-    {
-      "group": "Adr 006 Metrics",
-      "pages": [
-        "docs/ADR/adr-006-metrics"
-      ]
-    },
-    {
-      "group": "Adr 007 E2e Tests",
-      "pages": [
-        "docs/ADR/adr-007-e2e-tests"
-      ]
-    },
-    {
-      "group": "Adr 008 Automatic Signer List",
-      "pages": [
-        "docs/ADR/adr-008-automatic-signer-list"
-      ]
-    },
-    {
-      "group": "Adr 009 Blockchain Explorer",
-      "pages": [
-        "docs/ADR/adr-009-blockchain-explorer"
-      ]
-    },
-    {
-      "group": "Adr 010 Node Ungrades",
-      "pages": [
-        "docs/ADR/adr-010-node-ungrades"
-      ]
-    },
-    {
-      "group": "Adr 011 Superfluid Staking",
-      "pages": [
-        "docs/ADR/adr-011-superfluid-staking"
-      ]
-    },
-    {
-      "group": "Adr 012 Ton Integration",
-      "pages": [
-        "docs/ADR/adr-012-ton-integration"
-      ]
-    },
-    {
-      "group": "Adr 013 Rate Limiting",
-      "pages": [
-        "docs/ADR/adr-013-rate-limiting"
-      ]
-    },
-    {
-      "group": "Adr 014 Babylon Finality",
-      "pages": [
+        "docs/ADR/adr-001-grace-period",
+        "docs/ADR/adr-002-dynamic-committee",
+        "docs/ADR/adr-003-babylon",
+        "docs/ADR/adr-004-solana-integration",
+        "docs/ADR/adr-005-ordinals",
+        "docs/ADR/adr-006-metrics",
+        "docs/ADR/adr-007-e2e-tests",
+        "docs/ADR/adr-008-automatic-signer-list",
+        "docs/ADR/adr-009-blockchain-explorer",
+        "docs/ADR/adr-010-node-ungrades",
+        "docs/ADR/adr-011-superfluid-staking",
+        "docs/ADR/adr-012-ton-integration",
+        "docs/ADR/adr-013-rate-limiting",
         "docs/ADR/adr-014-babylon-finality"
       ]
     }

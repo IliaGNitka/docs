@@ -30,8 +30,28 @@ Each Token Factory denom allows the registration of one contract address. This c
 
 Contracts are able to integrate with these hooks by implementing `BlockBeforeSend` and `TrackBeforeSend` message as the following example:
 
-```
-#[entry_point]pub fn sudo(deps: DepsMut, env: Env, msg: SudoMsg) ->  StdResult<Response> {    match &msg{        SudoMsg::BlockBeforeSend { from, to, amount} => {            Ok(Response::new().add_attributes(vec![                ("hook", "block"),                ("from", from),                ("to", to),                ("amount", &amount.to_string())            ]))        },        SudoMsg::TrackBeforeSend { from, to, amount} => {            Ok(Response::new().add_attributes(vec![                ("hook", "track"),                ("from", from),                ("to", to),                ("amount", &amount.to_string())            ]))        }    }}
+```rust
+#[entry_point]
+pub fn sudo(deps: DepsMut, env: Env, msg: SudoMsg) ->  StdResult<Response> {
+    match &msg{
+        SudoMsg::BlockBeforeSend { from, to, amount} => {
+            Ok(Response::new().add_attributes(vec![
+                ("hook", "block"),
+                ("from", from),
+                ("to", to),
+                ("amount", &amount.to_string())
+            ]))
+        },
+        SudoMsg::TrackBeforeSend { from, to, amount} => {
+            Ok(Response::new().add_attributes(vec![
+                ("hook", "track"),
+                ("from", from),
+                ("to", to),
+                ("amount", &amount.to_string())
+            ]))
+        }
+    }
+}
 ```
 
 Note that since `TrackBeforeSend` hook can also be triggered upon module to module send (which is not gas metered), we internally gas meter `TrackBeforeSend` with a gas limit of 100\_000.

@@ -198,24 +198,60 @@ If you would like to override the memo field, use the `--ip` and `--node-id` fla
 
 An example `create-validator` command looks like this:
 
-```
-int3faced tx staking create-validator \  --from=my_validator \  --amount=1000000uint3 \  --chain-id="int3-test-2" \  --moniker="{your_moniker}" # replace it \   --website="https://int3face.io/" \  --details="Int3face lover" \  --commission-rate="0.1" \  --commission-max-rate="0.20" \  --commission-max-change-rate="0.01" \  --min-self-delegation="1" \  --pubkey='{"@type":"/cosmos.crypto.ed25519.PubKey","key":"w/YfkzNivDZ34y+mbK3/j3WWgYao18tBLf4Ypm2okCU="}' # replace it
+```shell
+int3faced tx staking create-validator \
+  --from=my_validator \
+  --amount=1000000uint3 \
+  --chain-id="int3-test-2" \
+  --moniker="{your_moniker}" # replace it \ 
+  --website="https://int3face.io/" \
+  --details="Int3face lover" \
+  --commission-rate="0.1" \
+  --commission-max-rate="0.20" \
+  --commission-max-change-rate="0.01" \
+  --min-self-delegation="1" \
+  --pubkey='{"@type":"/cosmos.crypto.ed25519.PubKey","key":"w/YfkzNivDZ34y+mbK3/j3WWgYao18tBLf4Ypm2okCU="}' # replace it
 ```
 
 ### Start a background service[​](#start-a-background-service "Direct link to Start a background service")
 
 You will need some way to keep the `int3faced start` process always running. If you're on linux, you can do this by creating a service.
 
-```
-sudo tee /etc/systemd/system/int3faced.service > /dev/null <<EOF  [Unit]Description=Int3face DaemonAfter=network-online.target[Service]User=$USERExecStart=$(which int3faced) startRestart=alwaysRestartSec=3LimitNOFILE=infinityEnvironment="DAEMON_HOME=$HOME/.int3faced/"Environment="DAEMON_NAME=int3faced"Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"Environment="DAEMON_RESTART_AFTER_UPGRADE=true"StandardOutput=append:$HOME/.int3faced/logs/int3faced.logStandardError=append:$HOME/.int3faced/logs/int3faced-error.logSyslogIdentifier=int3faced[Install]WantedBy=multi-user.targetEOF
+```shell
+sudo tee /etc/systemd/system/int3faced.service > /dev/null <<EOF  
+[Unit]
+Description=Int3face Daemon
+After=network-online.target
+
+[Service]
+User=$USER
+ExecStart=$(which int3faced) start
+Restart=always
+RestartSec=3
+LimitNOFILE=infinity
+
+Environment="DAEMON_HOME=$HOME/.int3faced/"
+Environment="DAEMON_NAME=int3faced"
+Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"
+Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
+
+StandardOutput=append:$HOME/.int3faced/logs/int3faced.log
+StandardError=append:$HOME/.int3faced/logs/int3faced-error.log
+SyslogIdentifier=int3faced
+
+[Install]
+WantedBy=multi-user.target
+EOF
 ```
 
 Service's logs are stored into the `$HOME/.int3faced/logs/` directory.
 
 Then update and start the node:
 
-```
-sudo -S systemctl daemon-reloadsudo -S systemctl enable int3facedsudo -S systemctl start int3faced
+```shell
+sudo -S systemctl daemon-reload
+sudo -S systemctl enable int3faced
+sudo -S systemctl start int3faced
 ```
 
 You can check the status with:
@@ -226,8 +262,10 @@ sudo -S systemctl status int3faced
 
 And disable, stop, or restart the service:
 
-```
-sudo -S systemctl disable int3facedsudo -S systemctl stop int3facedsudo -S systemctl restart int3faced
+```shell
+sudo -S systemctl disable int3faced
+sudo -S systemctl stop int3faced
+sudo -S systemctl restart int3faced
 ```
 
 Logs are available using the following command:
@@ -250,8 +288,9 @@ git clone https://github.com/Int3facechain/observer.git int3face-int3obsd
 
 Then, check out the last released version. Currently, it's `v0.2.3`.
 
-```
-cd int3face-int3obsdgit checkout v0.2.3
+```bash
+cd int3face-int3obsd
+git checkout v0.2.3
 ```
 
 At the top-level directory of the project execute the following command, which will build and install the `int3obsd` binary to `$GOPATH/bin`.
@@ -274,8 +313,16 @@ int3obsd init
 
 This creates the observer configuration in the Int3face home directory (`~/.int3faced` by default) with the following folders:
 
-```
-observer└── default    ├── tss    ├── logs    ├── node_key    ├── node_key.pub    ├── observer.toml    ├── pool_key.pub    └── pre_params.hex
+```text
+observer
+└── default
+    ├── tss
+    ├── logs
+    ├── node_key
+    ├── node_key.pub
+    ├── observer.toml
+    ├── pool_key.pub
+    └── pre_params.hex
 ```
 
 The `default` folder stores the current observer profile; refer to [Profiles](#profiles) for details. The profile folder contents:
@@ -324,16 +371,41 @@ source .profile
 
 This command will add a new variable called `PASSPHRASE` and persist it in your bash config. Later, the observer service will use it to start automatically.
 
-```
-sudo tee /etc/systemd/system/int3obsd.service > /dev/null <<EOF  [Unit]Description=Int3face Observer DaemonAfter=network-online.target[Service]User=$USERExecStart=/bin/sh -c 'echo ${PASSPHRASE} | $(which int3obsd) start --from my_validator_2'Restart=alwaysRestartSec=3LimitNOFILE=infinityEnvironment="DAEMON_HOME=$HOME/.int3faced/observer"Environment="DAEMON_NAME=int3obsd"Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"Environment="DAEMON_RESTART_AFTER_UPGRADE=true"StandardOutput=append:$HOME/.int3faced/observer/default/logs/int3obsd.logStandardError=append:$HOME/.int3faced/observer/default/logs/int3obsd-error.logSyslogIdentifier=int3obsd[Install]WantedBy=multi-user.targetEOF
+```shell
+sudo tee /etc/systemd/system/int3obsd.service > /dev/null <<EOF  
+[Unit]
+Description=Int3face Observer Daemon
+After=network-online.target
+
+[Service]
+User=$USER
+ExecStart=/bin/sh -c 'echo ${PASSPHRASE} | $(which int3obsd) start --from my_validator_2'
+Restart=always
+RestartSec=3
+LimitNOFILE=infinity
+
+Environment="DAEMON_HOME=$HOME/.int3faced/observer"
+Environment="DAEMON_NAME=int3obsd"
+Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"
+Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
+
+StandardOutput=append:$HOME/.int3faced/observer/default/logs/int3obsd.log
+StandardError=append:$HOME/.int3faced/observer/default/logs/int3obsd-error.log
+SyslogIdentifier=int3obsd
+
+[Install]
+WantedBy=multi-user.target
+EOF
 ```
 
 Service's logs are stored into the `$HOME/.int3faced/observer/default/logs/` directory.
 
 Then update and start the node:
 
-```
-sudo -S systemctl daemon-reloadsudo -S systemctl enable int3obsdsudo -S systemctl start int3obsd
+```shell
+sudo -S systemctl daemon-reload
+sudo -S systemctl enable int3obsd
+sudo -S systemctl start int3obsd
 ```
 
 You can check the status with:
@@ -344,8 +416,10 @@ sudo -S systemctl status int3obsd
 
 And disable, stop, or restart the service:
 
-```
-sudo -S systemctl disable int3obsdsudo -S systemctl stop int3obsdsudo -S systemctl restart int3obsd
+```shell
+sudo -S systemctl disable int3obsd
+sudo -S systemctl stop int3obsd
+sudo -S systemctl restart int3obsd
 ```
 
 Logs are available using the following command:
@@ -364,8 +438,13 @@ At the beginning, your node is not part of the TSS committee. While you can obse
 
 Download the DOGE binaries and extract them to the bin folder.
 
-```
-wget https://github.com/dogecoin/dogecoin/releases/download/v1.14.7/dogecoin-1.14.7-x86_64-linux-gnu.tar.gztar -xzvf dogecoin-1.14.7-x86_64-linux-gnu.tar.gzmv dogecoin-1.14.7/bin/* ~/bin/# We can remove theserm -rf dogecoin-1.14.7 dogecoin-1.14.7-x86_64-linux-gnu.tar.gz
+```shell
+wget https://github.com/dogecoin/dogecoin/releases/download/v1.14.7/dogecoin-1.14.7-x86_64-linux-gnu.tar.gz
+tar -xzvf dogecoin-1.14.7-x86_64-linux-gnu.tar.gz
+mv dogecoin-1.14.7/bin/* ~/bin/
+
+# We can remove these
+rm -rf dogecoin-1.14.7 dogecoin-1.14.7-x86_64-linux-gnu.tar.gz
 ```
 
 `bin` folder is a folder added to the `PATH` environment variable. However, you can use an arbitrary folder to store the binaries.
@@ -410,8 +489,24 @@ dogecoin-cli getinfo
 
 You should see a response like this:
 
-```
-{  "version": 1140700,  "protocolversion": 70015,  "walletversion": 130000,  "balance": 0.00000000,  "blocks": 55054,  "timeoffset": 0,  "connections": 8,  "proxy": "",  "difficulty": 0.0005981929943754981,  "testnet": true,  "keypoololdest": 1715596527,  "keypoolsize": 100,  "paytxfee": 0.01000000,  "relayfee": 0.00100000,  "errors": ""}
+```json
+{
+  "version": 1140700,
+  "protocolversion": 70015,
+  "walletversion": 130000,
+  "balance": 0.00000000,
+  "blocks": 55054,
+  "timeoffset": 0,
+  "connections": 8,
+  "proxy": "",
+  "difficulty": 0.0005981929943754981,
+  "testnet": true,
+  "keypoololdest": 1715596527,
+  "keypoolsize": 100,
+  "paytxfee": 0.01000000,
+  "relayfee": 0.00100000,
+  "errors": ""
+}
 ```
 
 ### Mine blocks[​](#mine-blocks "Direct link to Mine blocks")
@@ -427,7 +522,10 @@ dogecoin-cli generate 110
 Response:
 
 ```
-[  "ad3c340e804e0b08af4b3302613b8f8f02ad7b4ea1cb2267e296868ee9705027",  ...]
+[
+  "ad3c340e804e0b08af4b3302613b8f8f02ad7b4ea1cb2267e296868ee9705027",
+  ...
+]
 ```
 
 ### Verify the blocks are mined[​](#verify-the-blocks-are-mined "Direct link to Verify the blocks are mined")
@@ -446,8 +544,12 @@ dogecoin-cli getbalance
 
 ### Download binaries[​](#download-binaries-1 "Direct link to Download binaries")
 
-```
-wget https://bitcoincore.org/bin/bitcoin-core-25.0/bitcoin-25.0-x86_64-linux-gnu.tar.gztar -xzvf bitcoin-25.0-x86_64-linux-gnu.tar.gzmv bitcoin-25.0/bin/* ~/bin/rm -rf bitcoin-25.0  bitcoin-25.0-x86_64-linux-gnu.tar.gz
+```shell
+wget https://bitcoincore.org/bin/bitcoin-core-25.0/bitcoin-25.0-x86_64-linux-gnu.tar.gz
+tar -xzvf bitcoin-25.0-x86_64-linux-gnu.tar.gz
+mv bitcoin-25.0/bin/* ~/bin/
+
+rm -rf bitcoin-25.0  bitcoin-25.0-x86_64-linux-gnu.tar.gz
 ```
 
 `bin` folder is a folder added to the `PATH` environment variable. However, you can use an arbitrary folder to store the binaries.
@@ -490,8 +592,22 @@ bitcoin-cli getblockchaininfo
 
 You should see a response like this:
 
-```
-{  "chain": "regtest",  "blocks": 115,  "headers": 115,  "bestblockhash": "49e631bd7f92343f2c3a74636821493770309993ba59abbf518da911f850917f",  "difficulty": 4.656542373906925e-10,  "time": 1718890479,  "mediantime": 1718884754,  "verificationprogress": 1,  "initialblockdownload": false,  "chainwork": "00000000000000000000000000000000000000000000000000000000000000e8",  "size_on_disk": 38617,  "pruned": false,  "warnings": ""}
+```json
+{
+  "chain": "regtest",
+  "blocks": 115,
+  "headers": 115,
+  "bestblockhash": "49e631bd7f92343f2c3a74636821493770309993ba59abbf518da911f850917f",
+  "difficulty": 4.656542373906925e-10,
+  "time": 1718890479,
+  "mediantime": 1718884754,
+  "verificationprogress": 1,
+  "initialblockdownload": false,
+  "chainwork": "00000000000000000000000000000000000000000000000000000000000000e8",
+  "size_on_disk": 38617,
+  "pruned": false,
+  "warnings": ""
+}
 ```
 
 ### Create new wallet or load your own wallet[​](#create-new-wallet-or-load-your-own-wallet "Direct link to Create new wallet or load your own wallet")
@@ -553,8 +669,15 @@ bitcoin-cli getbalance
 
 BCH binaries names intersect with the BTC names. So, we are going to rename the binaries.
 
-```
-wget https://github.com/bitcoin-cash-node/bitcoin-cash-node/releases/download/v27.1.0/bitcoin-cash-node-27.1.0-x86_64-linux-gnu.tar.gztar -xzvf bitcoin-cash-node-27.1.0-x86_64-linux-gnu.tar.gzmv bitcoin-cash-node-27.1.0/bin/bitcoind ~/bin/bcashdmv bitcoin-cash-node-27.1.0/bin/bitcoin-cli ~/bin/bcash-climv bitcoin-cash-node-27.1.0/bin/bitcoin-tx ~/bin/bcash-txrm -rf bitcoin-cash-node-27.1.0 bitcoin-cash-node-27.1.0-x86_64-linux-gnu.tar.gz
+```shell
+wget https://github.com/bitcoin-cash-node/bitcoin-cash-node/releases/download/v27.1.0/bitcoin-cash-node-27.1.0-x86_64-linux-gnu.tar.gz
+tar -xzvf bitcoin-cash-node-27.1.0-x86_64-linux-gnu.tar.gz
+
+mv bitcoin-cash-node-27.1.0/bin/bitcoind ~/bin/bcashd
+mv bitcoin-cash-node-27.1.0/bin/bitcoin-cli ~/bin/bcash-cli
+mv bitcoin-cash-node-27.1.0/bin/bitcoin-tx ~/bin/bcash-tx
+
+rm -rf bitcoin-cash-node-27.1.0 bitcoin-cash-node-27.1.0-x86_64-linux-gnu.tar.gz
 ```
 
 ### Create home dir[​](#create-home-dir-2 "Direct link to Create home dir")
@@ -571,8 +694,10 @@ wget [https://raw.githubusercontent.com/Int3facechain/networks/main/int3-test-2/
 
 Since the BCH names and paths conflict with the BTC, let's create aliases for the main BCH binaries.
 
-```
-echo "alias bcashd='bcashd -conf=$HOME/.bitcoin-cash/bitcoin-cash.conf -datadir=$HOME/.bitcoin-cash'" | tee -a .profileecho "alias bcash-cli='bcash-cli -conf=$HOME/.bitcoin-cash/bitcoin-cash.conf'" | tee -a .profile
+```shell
+echo "alias bcashd='bcashd -conf=$HOME/.bitcoin-cash/bitcoin-cash.conf -datadir=$HOME/.bitcoin-cash'" | tee -a .profile
+
+echo "alias bcash-cli='bcash-cli -conf=$HOME/.bitcoin-cash/bitcoin-cash.conf'" | tee -a .profile
 ```
 
 And to load changes type
@@ -595,8 +720,21 @@ bcash-cli getblockchaininfo
 
 You should see a response like this:
 
-```
-{  "chain": "regtest",  "blocks": 0,  "headers": 0,  "bestblockhash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",  "difficulty": 4.656542373906925e-10,  "mediantime": 1296688602,  "verificationprogress": 1,  "initialblockdownload": true,  "chainwork": "0000000000000000000000000000000000000000000000000000000000000002",  "size_on_disk": 293,  "pruned": false,  "warnings": ""}
+```json
+{
+  "chain": "regtest",
+  "blocks": 0,
+  "headers": 0,
+  "bestblockhash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+  "difficulty": 4.656542373906925e-10,
+  "mediantime": 1296688602,
+  "verificationprogress": 1,
+  "initialblockdownload": true,
+  "chainwork": "0000000000000000000000000000000000000000000000000000000000000002",
+  "size_on_disk": 293,
+  "pruned": false,
+  "warnings": ""
+}
 ```
 
 ### Create new address for your wallet[​](#create-new-address-for-your-wallet-1 "Direct link to Create new address for your wallet")
@@ -629,8 +767,12 @@ bcash-cli getbalance
 
 ### Download binaries[​](#download-binaries-3 "Direct link to Download binaries")
 
-```
-wget https://download.litecoin.org/litecoin-0.21.3/linux/litecoin-0.21.3-x86_64-linux-gnu.tar.gztar -xzvf litecoin-0.21.3-x86_64-linux-gnu.tar.gzmv litecoin-0.21.3/bin/* ~/bin/rm -rf litecoin-0.21.3 litecoin-0.21.3-x86_64-linux-gnu.tar.gz
+```shell
+wget https://download.litecoin.org/litecoin-0.21.3/linux/litecoin-0.21.3-x86_64-linux-gnu.tar.gz
+tar -xzvf litecoin-0.21.3-x86_64-linux-gnu.tar.gz
+mv litecoin-0.21.3/bin/* ~/bin/
+
+rm -rf litecoin-0.21.3 litecoin-0.21.3-x86_64-linux-gnu.tar.gz
 ```
 
 `bin` folder is a folder added to the `PATH` environment variable. However, you can use an arbitrary folder to store the binaries.
@@ -673,8 +815,79 @@ litecoin-cli getblockchaininfo
 
 You should see a response like this:
 
-```
-{  "chain": "regtest",  "blocks": 0,  "headers": 0,  "bestblockhash": "530827f38f93b43ed12af0b3ad25a288dc02ed74d6d7857862df51fc56c416f9",  "difficulty": 4.656542373906925e-10,  "mediantime": 1296688602,  "verificationprogress": 1,  "initialblockdownload": true,  "chainwork": "0000000000000000000000000000000000000000000000000000000000000002",  "size_on_disk": 288,  "pruned": false,  "softforks": {    "bip34": {      "type": "buried",      "active": false,      "height": 500    },    "bip66": {      "type": "buried",      "active": false,      "height": 1251    },    "bip65": {      "type": "buried",      "active": false,      "height": 1351    },    "csv": {      "type": "buried",      "active": false,      "height": 432    },    "segwit": {      "type": "buried",      "active": true,      "height": 0    },    "testdummy": {      "type": "bip9",      "bip9": {        "status": "defined",        "start_time": 0,        "timeout": 9223372036854775807,        "since": 0      },      "active": false    },    "taproot": {      "type": "bip9",      "bip9": {        "status": "active",        "start_time": -1,        "timeout": 9223372036854775807,        "since": 0      },      "height": 0,      "active": true    },    "mweb": {      "type": "bip9",      "bip9": {        "status": "defined",        "start_time": 1601450001,        "timeout": 9223372036854775807,        "since": 0      },      "active": false    }  },  "warnings": ""}
+```json
+{
+  "chain": "regtest",
+  "blocks": 0,
+  "headers": 0,
+  "bestblockhash": "530827f38f93b43ed12af0b3ad25a288dc02ed74d6d7857862df51fc56c416f9",
+  "difficulty": 4.656542373906925e-10,
+  "mediantime": 1296688602,
+  "verificationprogress": 1,
+  "initialblockdownload": true,
+  "chainwork": "0000000000000000000000000000000000000000000000000000000000000002",
+  "size_on_disk": 288,
+  "pruned": false,
+  "softforks": {
+    "bip34": {
+      "type": "buried",
+      "active": false,
+      "height": 500
+    },
+    "bip66": {
+      "type": "buried",
+      "active": false,
+      "height": 1251
+    },
+    "bip65": {
+      "type": "buried",
+      "active": false,
+      "height": 1351
+    },
+    "csv": {
+      "type": "buried",
+      "active": false,
+      "height": 432
+    },
+    "segwit": {
+      "type": "buried",
+      "active": true,
+      "height": 0
+    },
+    "testdummy": {
+      "type": "bip9",
+      "bip9": {
+        "status": "defined",
+        "start_time": 0,
+        "timeout": 9223372036854775807,
+        "since": 0
+      },
+      "active": false
+    },
+    "taproot": {
+      "type": "bip9",
+      "bip9": {
+        "status": "active",
+        "start_time": -1,
+        "timeout": 9223372036854775807,
+        "since": 0
+      },
+      "height": 0,
+      "active": true
+    },
+    "mweb": {
+      "type": "bip9",
+      "bip9": {
+        "status": "defined",
+        "start_time": 1601450001,
+        "timeout": 9223372036854775807,
+        "since": 0
+      },
+      "active": false
+    }
+  },
+  "warnings": ""
+}
 ```
 
 ### Create new wallet[​](#create-new-wallet "Direct link to Create new wallet")

@@ -30,11 +30,11 @@ In Babylon, each finality provider has its own address in Bitcoin, which can be 
 
 Bitcoin delegation process:
 
-![adr003\_babylon\_staking](/docs/assets/images/adr003_babylon_staking-1157475f950f580e0d47961522ff3acd.png)
+![adr003\_babylon\_staking](./docs/assets/images/adr003_babylon_staking-1157475f950f580e0d47961522ff3acd.png)
 
 Bitcoin transfer process:
 
-![adr003\_int3face\_transferring](/docs/assets/images/adr003_int3face_transferring-1ff18fdb2b02aff57282f94dc7f6f2eb.png)
+![adr003\_int3face\_transferring](./docs/assets/images/adr003_int3face_transferring-1ff18fdb2b02aff57282f94dc7f6f2eb.png)
 
 The idea is to use the Int3face vault address as the staking vault. All users who use it for staking will receive an equivalent amount of funds in Cosmos-based tokens. Conversely, everyone intending to transfer will simultaneously receive bonus fees for staking. This can be considered a form of **Bitcoin Liquid Staking**.
 
@@ -42,7 +42,7 @@ The idea is to use the Int3face vault address as the staking vault. All users wh
 
 **Distribute vault funds across multiple finality providers**. As soon as the Int3face vault receives an incoming transfer, it stakes the funds using several finality providers.
 
-![adr003\_babylon\_int3face\_option\_1](/docs/assets/images/adr003_babylon_int3face_option_1-a2f075df72ef162bc13f8ca1f890d336.png)
+![adr003\_babylon\_int3face\_option\_1](./docs/assets/images/adr003_babylon_int3face_option_1-a2f075df72ef162bc13f8ca1f890d336.png)
 
 Difficulties:
 
@@ -56,7 +56,7 @@ Difficulties:
 
 **Transfer the asset to Babylon using IBC and stake directly, bypassing Bitcoin**. This option involves establishing the IBC connection, allowing special wrapped tokens to be transferred to Babylon and staked directly without interacting with Bitcoin.
 
-![adr003\_babylon\_int3face\_option\_2](/docs/assets/images/adr003_babylon_int3face_option_2-ce8f92956713a480a425feb6da2525b0.png)
+![adr003\_babylon\_int3face\_option\_2](./docs/assets/images/adr003_babylon_int3face_option_2-ce8f92956713a480a425feb6da2525b0.png)
 
 Difficulties:
 

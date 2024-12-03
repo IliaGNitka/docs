@@ -70,14 +70,15 @@ Int3face node provides CLI commands for submitting inbound and outbound transfer
 
 To install Int3face node, download the binary from the [releases page](https://github.com/Int3facechain/networks/releases) or clone the repository to your local machine from Github. Please contact the Int3face team for accessing the `Int3facechain/bridge` repository.
 
-```
+```bash
 git clone https://github.com/Int3facechain/bridge.git int3face-bridge
 ```
 
 Then, check out the last released version. Currently, it's `v0.2.7`.
 
-```
-cd int3face-bridgegit checkout v0.2.7
+```bash
+cd int3face-bridge
+git checkout v0.2.7
 ```
 
 At the top-level directory of the project execute the following command, which will build and install the `int3faced` binary to `$GOPATH/bin`.
@@ -198,24 +199,61 @@ If you would like to override the memo field, use the `--ip` and `--node-id` fla
 
 An example `create-validator` command looks like this:
 
-```
-int3faced tx staking create-validator \  --from=my_validator \  --amount=10000000uint3 \  --chain-id="int3face-1" \  --moniker="{your_moniker}" # replace it \   --website="https://validator.website.io/" # replace it \  --details="Validator info" # replace it \   --commission-rate="0.1" \  --commission-max-rate="0.20" \  --commission-max-change-rate="0.01" \  --min-self-delegation="1" \  --pubkey='{"@type":"/cosmos.crypto.ed25519.PubKey","key":"w/YfkzNivDZ34y+mbK3/j3WWgYao18tBLf4Ypm2okCU="}' # replace it
+```shell
+int3faced tx staking create-validator \
+  --from=my_validator \
+  --amount=10000000uint3 \
+  --chain-id="int3face-1" \
+  --moniker="{your_moniker}" # replace it \ 
+  --website="https://validator.website.io/" # replace it \
+  --details="Validator info" # replace it \ 
+  --commission-rate="0.1" \
+  --commission-max-rate="0.20" \
+  --commission-max-change-rate="0.01" \
+  --min-self-delegation="1" \
+  --pubkey='{"@type":"/cosmos.crypto.ed25519.PubKey","key":"w/YfkzNivDZ34y+mbK3/j3WWgYao18tBLf4Ypm2okCU="}' # replace it
+
 ```
 
 ### Start a background service[​](#start-a-background-service "Direct link to Start a background service")
 
 You will need some way to keep the `int3faced start` process always running. If you're on linux, you can do this by creating a service.
 
-```
-sudo tee /etc/systemd/system/int3faced.service > /dev/null <<EOF  [Unit]Description=Int3face DaemonAfter=network-online.target[Service]User=$USERExecStart=$(which int3faced) startRestart=alwaysRestartSec=3LimitNOFILE=infinityEnvironment="DAEMON_HOME=$HOME/.int3faced/"Environment="DAEMON_NAME=int3faced"Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"Environment="DAEMON_RESTART_AFTER_UPGRADE=true"StandardOutput=append:$HOME/.int3faced/logs/int3faced.logStandardError=append:$HOME/.int3faced/logs/int3faced-error.logSyslogIdentifier=int3faced[Install]WantedBy=multi-user.targetEOF
+```shell
+sudo tee /etc/systemd/system/int3faced.service > /dev/null <<EOF  
+[Unit]
+Description=Int3face Daemon
+After=network-online.target
+
+[Service]
+User=$USER
+ExecStart=$(which int3faced) start
+Restart=always
+RestartSec=3
+LimitNOFILE=infinity
+
+Environment="DAEMON_HOME=$HOME/.int3faced/"
+Environment="DAEMON_NAME=int3faced"
+Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"
+Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
+
+StandardOutput=append:$HOME/.int3faced/logs/int3faced.log
+StandardError=append:$HOME/.int3faced/logs/int3faced-error.log
+SyslogIdentifier=int3faced
+
+[Install]
+WantedBy=multi-user.target
+EOF
 ```
 
 Service's logs are stored into the `$HOME/.int3faced/logs/` directory.
 
 Then update and start the node:
 
-```
-sudo -S systemctl daemon-reloadsudo -S systemctl enable int3facedsudo -S systemctl start int3faced
+```shell
+sudo -S systemctl daemon-reload
+sudo -S systemctl enable int3faced
+sudo -S systemctl start int3faced
 ```
 
 You can check the status with:
@@ -226,8 +264,10 @@ sudo -S systemctl status int3faced
 
 And disable, stop, or restart the service:
 
-```
-sudo -S systemctl disable int3facedsudo -S systemctl stop int3facedsudo -S systemctl restart int3faced
+```shell
+sudo -S systemctl disable int3faced
+sudo -S systemctl stop int3faced
+sudo -S systemctl restart int3faced
 ```
 
 Logs are available using the following command:

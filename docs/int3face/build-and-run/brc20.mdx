@@ -16,8 +16,12 @@ Instruction on how to setup Bitcoin Regtest node alongside Ordinals node, and ho
 
 1. Download the binaries, extract to the bin folder
 
-```
-wget https://bitcoincore.org/bin/bitcoin-core-25.0/bitcoin-25.0-x86_64-linux-gnu.tar.gztar -xzvf bitcoin-25.0-x86_64-linux-gnu.tar.gzmv bitcoin-25.0/bin/* ~/bin/rm -rf bitcoin-25.0  bitcoin-25.0-x86_64-linux-gnu.tar.gz
+```sh
+wget https://bitcoincore.org/bin/bitcoin-core-25.0/bitcoin-25.0-x86_64-linux-gnu.tar.gz
+tar -xzvf bitcoin-25.0-x86_64-linux-gnu.tar.gz
+mv bitcoin-25.0/bin/* ~/bin/
+
+rm -rf bitcoin-25.0  bitcoin-25.0-x86_64-linux-gnu.tar.gz
 ```
 
 2. Create home dir for bitcoin
@@ -29,7 +33,14 @@ mkdir ~/.bitcoin
 3. Initialize configuration file at `~/.bitcoin/bitcoin.conf`
 
 ```
-daemon=1server=1regtest=1listen=1txindex=1rpcconnect=127.0.0.1rpcuser=bitcoinrpcrpcpassword=pass
+daemon=1
+server=1
+regtest=1
+listen=1
+txindex=1
+rpcconnect=127.0.0.1
+rpcuser=bitcoinrpc
+rpcpassword=pass
 ```
 
 4. Start the node
@@ -67,7 +78,23 @@ Built binary will be located at `{project_root}/target/release/ord`
 3. Create config file for the ord server `ord.yaml`
 
 ```
-bitcoin_data_dir: $HOME/.bitcoin/bitcoin_rpc_password: CCwXB6IxXcYMlBd6w812yfmiahxYBnlR0KLlvMIjgOrGq9eqgj9WmdeTCSDVo4w9bitcoin_rpc_url: http://localhost:18443bitcoin_rpc_username: bitcoinrpcchain: regtestdata_dir: $HOME/.ord/first_inscription_height: 0index: $HOME/.ord/index.redbindex_addresses: trueindex_cache_size: 1000000000index_runes: trueindex_sats: trueindex_spent_sats: trueindex_transactions: trueserver_password: fooserver_url: http://localhost:80server_username: bar
+bitcoin_data_dir: $HOME/.bitcoin/
+bitcoin_rpc_password: CCwXB6IxXcYMlBd6w812yfmiahxYBnlR0KLlvMIjgOrGq9eqgj9WmdeTCSDVo4w9
+bitcoin_rpc_url: http://localhost:18443
+bitcoin_rpc_username: bitcoinrpc
+chain: regtest
+data_dir: $HOME/.ord/
+first_inscription_height: 0
+index: $HOME/.ord/index.redb
+index_addresses: true
+index_cache_size: 1000000000
+index_runes: true
+index_sats: true
+index_spent_sats: true
+index_transactions: true
+server_password: foo
+server_url: http://localhost:80
+server_username: bar
 ```
 
 4. Start the `ord` node
@@ -106,8 +133,15 @@ Now we have everything ready to inscribe and execute brc-20 txs
 
 1. Create a json file with a deploy message
 
-```
-{    "p": "brc-20",    "op": "deploy",    "tick": "ordi",    "max": "1000000",    "lim": "1000",    "dec": "18"}
+```json
+{
+    "p": "brc-20",
+    "op": "deploy",
+    "tick": "ordi",
+    "max": "1000000",
+    "lim": "1000",
+    "dec": "18"
+}
 ```
 
 2. Create a transaction with the inscription for your wallet
@@ -126,8 +160,13 @@ bitcoin-cli generatetoaddress 1 "{YOUR_ADDR}"
 
 1. Create a json file with a mint message
 
-```
-{    "p": "brc-20",    "op": "mint",    "tick": "ordi",    "amt": "1000"}
+```json
+{
+    "p": "brc-20",
+    "op": "mint",
+    "tick": "ordi",
+    "amt": "1000"
+}
 ```
 
 2. Create a transaction with the inscription for your wallet
@@ -146,8 +185,13 @@ bitcoin-cli generatetoaddress 1 "{YOUR_ADDR}"
 
 1. Create a json file with a transfer message
 
-```
-{    "p": "brc-20",    "op": "transfer",    "tick": "ordi",    "amt": "100"}
+```json
+{
+    "p": "brc-20",
+    "op": "transfer",
+    "tick": "ordi",
+    "amt": "100"
+}
 ```
 
 2. Create a transaction with the inscription for your wallet

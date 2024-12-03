@@ -23,7 +23,7 @@ The outbound transfer consists of the following steps:
 6. The observer adds it to the internal quest.
 7. The observer uses the corresponding external chain client to build, sign, and broadcast the transaction.
 
-![outbound\_current](/docs/assets/images/outbound_queue-95d4f9c0613c554989173004ac28f6a6.png)
+![outbound\_current](./docs/assets/images/outbound_queue-95d4f9c0613c554989173004ac28f6a6.png)
 
 The flow is quite straightforward. However, dynamic committee handling involves many corner cases that we need to be aware of:
 
@@ -51,11 +51,11 @@ Considering that, once the observer receives the `MsgOutboundTransferRetry` comm
 
 Thus, the retry process looks like the following:
 
-![outbound\_current](/docs/assets/images/outbound_queue_retry-69856be91ed97a6c010646122ec3d5aa.png)
+![outbound\_current](./docs/assets/images/outbound_queue_retry-69856be91ed97a6c010646122ec3d5aa.png)
 
 And the observer start up is as follows:
 
-![observer\_reboot](/docs/assets/images/observer_reboot-1b4eba9c1a6751e3936e2a4918c89b29.png)
+![observer\_reboot](./docs/assets/images/observer_reboot-1b4eba9c1a6751e3936e2a4918c89b29.png)
 
 ## Alternative approaches[​](#alternative-approaches "Direct link to Alternative approaches")
 
