@@ -1,10 +1,10 @@
 ---
 title: "Integration Quick Guide"
 ---
+![banner](./docs/assets/images/banner-c3a9e34c0386b1410bc41c59267a8875.jpg)
 
 These are steps on how to use the Bi[t]fröst Int3face to bridge external tokens to other chains.
 
-![banner](./docs/assets/images/banner-c3a9e34c0386b1410bc41c59267a8875.jpg)
 
 ## 1. Vault Address Obtaining[​](#1 "Direct link to Vault Address Obtaining")
 
@@ -44,8 +44,8 @@ const cell = beginCell()
         .endCell();
 ```
 Where:  
-> OSMO - the code of recipient's chain  
-> toAddress – recipient's address on Osmois chain  
+> <u>OSMO</u> - the code of recipient's chain  
+> <u>toAddress</u> – recipient's address on Osmois chain  
 
 The transaction message example:
 ```json
@@ -62,8 +62,8 @@ The transaction message example:
       }
 ```
 Where:  
-> vault – Vault address obtained in step 1(#1)  
-> amount – Amount of transferred tokens  
+> <u>vault</u> – Vault address obtained in step 1(#1)  
+> <u>amount</u> – Amount of transferred tokens  
 
 ## IBC to External Chain Transactions (#ibc-to-external
 
@@ -93,7 +93,7 @@ Transaction message example:
     ]
 ```
 Where:  
-> *dest-address* – Is the target address for the transfer (TON address in this example)  
-> *receiver* – Static Bridge address. Will be used across all the chains. Value should remain the same: **int31zlefkpe3g0vvm9a4h0jf9000lmqutlh99h7fsd**  
-> *denom* – Static mappings of tokens. All mappings will be listed in the official documentation. ibc/DDE1238DCBC338C0FD0700A72CBD64C017B7A646C4A46789ADFB5D47F1E52E38 – represents a TON.int3 token  
-> *amount* – amount of tokens (TON.int3 token in this example)
+> <u>*dest-address*</u> – Is the target address for the transfer (TON address in this example)  
+> <u>*receiver*</u> – Static Bridge address. Will be used across all the chains. Value should remain the same: **int31zlefkpe3g0vvm9a4h0jf9000lmqutlh99h7fsd**  
+> <u>*denom*</u> – Static mappings of tokens. All mappings will be listed in the official documentation. ibc/DDE1238DCBC338C0FD0700A72CBD64C017B7A646C4A46789ADFB5D47F1E52E38 – represents a TON.int3 token  
+> <u>*amount*</u> – amount of tokens (TON.int3 token in this example)
