@@ -1,0 +1,98 @@
+---
+title: "Int3face Integration Quick Guide"
+---
+
+These are steps on how to use the Bi[t]fröst Int3face to bridge external tokens to other chains.
+
+![banner](./docs/assets/images/banner-c3a9e34c0386b1410bc41c59267a8875.jpg)
+
+## 1. Vault Address Obtaining[​](#1 "Direct link to Vault Address Obtaining")
+
+In order to perform the inbound transfer, it is necessary to obtain a Vault Address. It could be done through the request:
+	Testnet: https://observer.testnet.int3face.zone/v1/vault_addresses
+	Mainnet: https://observer.mainnet.int3face.zone/v1/vault_addresses
+
+## 2. Sending Inbound Transaction to the bridge[​](#2 "Direct link to Sending Inbound Transaction to the bridge")
+
+To perform a token bridging, send a transaction to a proper vault with a chain-specific memo.
+Vault address can be found in [Vault Address Obtaining](#1) section
+
+## UTXO to IBC transactions (#utxo-to-ibc)
+
+In case of UTXO chain to IBC chain transaction it should look like:
+
+```json
+Tx {
+   ToAddress: vault_address
+   Memo: OSMO:osmouseraddress
+}
+```
+
+## TON to IBC transactions (#ton-to-ibc)
+
+For a TON transfer to IBC chains, the TON-IBC bridge vault contract should be used.
+Smart conract payload example:
+
+```
+const cell = beginCell()
+        .storeUint(0xf9471134, 32) // Deposit Operation Code
+        .storeUint(0, 64)
+        .storeStringTail("OSMO")
+        .storeStringTail(':')
+        .storeStringTail(toAddress) // Osmosis recipient address
+        .endCell();
+```
+Where: 
+  OSMO - the code of recipient's chain
+  toAddress – recipient's address on Osmois chain
+
+The transaction message example:
+```json
+{
+        validUntil: Math.floor(Date.now() / 1000) + 360,
+        messages: [
+          {
+            address: vault, // Vault address
+            amount: toNano(data.amount).toString(),
+            payload: cell.toBoc().toString('base64'),
+          },
+        ],
+        network: isMainnet ? "-239" : "-3",
+      }
+```
+Where:
+  vault – Vault address obtained in step 1(#1)
+  amount – Amount of transferred tokens
+
+## IBC to External Chain Transactions (#ibc-to-external
+
+Bridging to external chain from IBC requires a transaction with specific parameters. 
+Transaction message example:
+```json
+  "messages": [
+      {
+        "typeUrl": "/ibc.applications.transfer.v1.MsgTransfer",
+        "value": {
+          "memo": "{\"dest-address\": \"UQB_IYQNLzNJmTqzrbx21u4-qPG6TFe3QtBYdmUoFJNYgvCL\"}",
+          "receiver": "int31zlefkpe3g0vvm9a4h0jf9000lmqutlh99h7fsd",
+          "sender": "osmo1jssqq9mas2dg5p5x847fz0n58uqqz2nl9q9mhy",
+          "sourceChannel": "channel-82819",
+          "sourcePort": "transfer",
+          "timeoutHeight": {
+            "revisionHeight": "0",
+            "revisionNumber": "0"
+          },
+          "timeoutTimestamp": "1734441153000000000",
+          "token": {
+            "amount": "1100000000",
+            "denom": "ibc/DDE1238DCBC338C0FD0700A72CBD64C017B7A646C4A46789ADFB5D47F1E52E38"
+          }
+        }
+      }
+    ]
+```
+Where:
+  *dest-address* – Is the target address for the transfer (TON address in this example)
+  *receiver* – Static Bridge address. Will be used across all the chains. Value should remain the same: **int31zlefkpe3g0vvm9a4h0jf9000lmqutlh99h7fsd**
+  *denom* – Static mappings of tokens. All mappings will be listed in the official documentation. ibc/DDE1238DCBC338C0FD0700A72CBD64C017B7A646C4A46789ADFB5D47F1E52E38 – represents a TON.int3 token
+  *amount* – amount of tokens (TON.int3 token in this example)
