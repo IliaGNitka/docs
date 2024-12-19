@@ -9,8 +9,8 @@ These are steps on how to use the Bi[t]fröst Int3face to bridge external tokens
 ## 1. Vault Address Obtaining[​](#1 "Direct link to Vault Address Obtaining")
 
 In order to perform the inbound transfer, it is necessary to obtain a Vault Address. It could be done through the request:
- Testnet: https://observer.testnet.int3face.zone/v1/vault_addresses
- Mainnet: https://observer.mainnet.int3face.zone/v1/vault_addresses
+> Testnet: https://observer.testnet.int3face.zone/v1/vault_addresses
+> Mainnet: https://observer.mainnet.int3face.zone/v1/vault_addresses
 
 ## 2. Sending Inbound Transaction to the bridge[​](#2 "Direct link to Sending Inbound Transaction to the bridge")
 
@@ -42,7 +42,7 @@ const cell = beginCell()
         .storeStringTail(toAddress) // Osmosis recipient address
         .endCell();
 ```
-Where: 
+Where:
   OSMO - the code of recipient's chain
   toAddress – recipient's address on Osmois chain
 
