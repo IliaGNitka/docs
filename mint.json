@@ -12,6 +12,7 @@
       "group": "Int3face",
       "pages": [
         "docs/int3face/overview",
+        "docs/int3face/integration",
         {
           "group": "Build and run",
           "pages": [
