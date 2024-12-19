@@ -43,9 +43,9 @@ const cell = beginCell()
         .storeStringTail(toAddress) // Osmosis recipient address
         .endCell();
 ```
-Where:
-  OSMO - the code of recipient's chain
-  toAddress – recipient's address on Osmois chain
+Where:  
+> OSMO - the code of recipient's chain  
+> toAddress – recipient's address on Osmois chain  
 
 The transaction message example:
 ```json
@@ -61,9 +61,9 @@ The transaction message example:
         network: isMainnet ? "-239" : "-3",
       }
 ```
-Where:
-  vault – Vault address obtained in step 1(#1)
-  amount – Amount of transferred tokens
+Where:  
+> vault – Vault address obtained in step 1(#1)  
+> amount – Amount of transferred tokens  
 
 ## IBC to External Chain Transactions (#ibc-to-external
 
@@ -92,8 +92,8 @@ Transaction message example:
       }
     ]
 ```
-Where:
- *dest-address* – Is the target address for the transfer (TON address in this example)
- *receiver* – Static Bridge address. Will be used across all the chains. Value should remain the same: **int31zlefkpe3g0vvm9a4h0jf9000lmqutlh99h7fsd**
- *denom* – Static mappings of tokens. All mappings will be listed in the official documentation. ibc/DDE1238DCBC338C0FD0700A72CBD64C017B7A646C4A46789ADFB5D47F1E52E38 – represents a TON.int3 token
- *amount* – amount of tokens (TON.int3 token in this example)
+Where:  
+> *dest-address* – Is the target address for the transfer (TON address in this example)  
+> *receiver* – Static Bridge address. Will be used across all the chains. Value should remain the same: **int31zlefkpe3g0vvm9a4h0jf9000lmqutlh99h7fsd**  
+> *denom* – Static mappings of tokens. All mappings will be listed in the official documentation. ibc/DDE1238DCBC338C0FD0700A72CBD64C017B7A646C4A46789ADFB5D47F1E52E38 – represents a TON.int3 token  
+> *amount* – amount of tokens (TON.int3 token in this example)
